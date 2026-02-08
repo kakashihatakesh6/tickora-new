@@ -6,9 +6,21 @@ import Image from 'next/image';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, MapPin, ChevronLeft, Share2, Info } from 'lucide-react';
-import SeatMap from '@/components/SeatMap';
+import { Calendar, MapPin, ChevronLeft, Star, Clock, Languages, ThumbsUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Define types for Cast and Crew based on backend seed
+interface CastMember {
+    name: string;
+    role: string;
+    image: string;
+}
+
+interface CrewMember {
+    name: string;
+    role: string;
+    image: string;
+}
 
 interface Event {
     id: number;
@@ -22,6 +34,12 @@ interface Event {
     available_seats: number;
     image_url: string;
     occupied_seats?: string[];
+    // New fields
+    cast?: CastMember[];
+    crew?: CrewMember[];
+    duration?: string;
+    language?: string;
+    rating?: number;
 }
 
 export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -29,8 +47,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     const router = useRouter();
     const [event, setEvent] = useState<Event | null>(null);
     const [loading, setLoading] = useState(true);
-    const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -46,33 +62,8 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         fetchEvent();
     }, [id]);
 
-    const handleSeatSelect = (seatId: string) => {
-        setSelectedSeats(prev => {
-            if (prev.includes(seatId)) {
-                return prev.filter(s => s !== seatId);
-            }
-            if (prev.length >= 10) {
-                alert("You can only select up to 10 seats.");
-                return prev;
-            }
-            return [...prev, seatId];
-        });
-    };
-
     const handleBook = () => {
-        // Check auth
-        if (!localStorage.getItem('token')) {
-            router.push('/login');
-            return;
-        }
-
-        if (selectedSeats.length === 0) {
-            alert("Please select at least one seat.");
-            return;
-        }
-
-        const seatsParam = selectedSeats.join(',');
-        router.push(`/bookings/checkout?eventId=${id}&seats=${seatsParam}`);
+        router.push(`/events/${id}/shows`);
     };
 
     if (loading) {
@@ -104,27 +95,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         </div>
                     </div>
                 </div>
-
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 relative z-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-2 space-y-8">
-                            <div className="h-40 bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800">
-                                <div className="h-8 w-48 bg-gray-200 dark:bg-gray-800 rounded mb-4" />
-                                <div className="space-y-2">
-                                    <div className="h-4 w-full bg-gray-200 dark:bg-gray-800 rounded" />
-                                    <div className="h-4 w-full bg-gray-200 dark:bg-gray-800 rounded" />
-                                    <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-800 rounded" />
-                                </div>
-                            </div>
-
-                            <div className="h-[400px] bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800" />
-                        </div>
-
-                        <div className="lg:col-span-1">
-                            <div className="h-80 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6" />
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }
@@ -138,8 +108,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             </div>
         );
     }
-
-    const totalPrice = event.price * selectedSeats.length;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black pb-20">
@@ -157,9 +125,6 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                 {/* Gradient Overlays */}
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-gray-50/60 to-transparent dark:from-black dark:via-black/60 dark:to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
-
-                {/* Navbar Spacer */}
-                {/* <div className="h-20" /> */}
 
                 {/* Navigation and Content Container */}
                 <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">
@@ -190,7 +155,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
                         {/* Event Details */}
                         <div className="flex-1 space-y-4 text-center md:text-left">
-                            <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
                                 <span className={cn(
                                     "px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full shadow-sm backdrop-blur-md",
                                     event.event_type === 'MOVIE' ? "bg-red-500/90 text-white" :
@@ -199,28 +164,49 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                 )}>
                                     {event.event_type}
                                 </span>
-                                <span className="px-3 py-1 bg-white/20 dark:bg-white/10 backdrop-blur-md text-gray-900 dark:text-gray-100 text-xs font-bold rounded-full">
-                                    {event.city}
-                                </span>
+                                {event.language && (
+                                    <span className="px-3 py-1 bg-white/20 dark:bg-white/10 backdrop-blur-md text-gray-900 dark:text-gray-100 text-xs font-bold rounded-full flex items-center gap-1">
+                                        <Languages className="w-3 h-3" />
+                                        {event.language}
+                                    </span>
+                                )}
+                                {event.rating && (
+                                    <span className="px-3 py-1 bg-yellow-400/90 text-black backdrop-blur-md text-xs font-bold rounded-full flex items-center gap-1">
+                                        <Star className="w-3 h-3 fill-current" />
+                                        {event.rating}/5
+                                    </span>
+                                )}
                             </div>
 
                             <h1 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white leading-tight tracking-tight drop-shadow-sm">
                                 {event.title}
                             </h1>
 
-                            <div className="flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-3 text-lg font-medium text-gray-800 dark:text-gray-200">
-                                <div className="flex items-center gap-2">
-                                    <div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-full">
-                                        <Calendar className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                            <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-3 text-lg font-medium text-gray-800 dark:text-gray-200">
+                                {event.duration && (
+                                    <div className="flex items-center gap-2">
+                                        <Clock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                                        <span>{event.duration}</span>
                                     </div>
-                                    <span>{new Date(event.date_time).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                )}
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                                    <span>{new Date(event.date_time).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' })}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="p-2 bg-pink-100 dark:bg-pink-500/20 rounded-full">
-                                        <MapPin className="h-5 w-5 text-pink-600 dark:text-pink-400" />
-                                    </div>
-                                    <span>{event.venue}</span>
+                                    <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                                    <span>{event.venue}, {event.city}</span>
                                 </div>
+                            </div>
+
+                            <div className="pt-4 flex justify-center md:justify-start">
+                                <Button
+                                    size="lg"
+                                    className="h-14 px-8 text-lg font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-600/30 transition-all hover:scale-105"
+                                    onClick={handleBook}
+                                >
+                                    Book Tickets
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -228,10 +214,10 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             </div>
 
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Description & Seats */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Mobile Poster (Visible only on small screens) */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    {/* Left Column: Description, Cast, Crew */}
+                    <div className="lg:col-span-2 space-y-12">
+                        {/* Mobile Poster */}
                         <div className="md:hidden relative h-64 w-full rounded-2xl overflow-hidden shadow-xl mb-6 ring-1 ring-black/5">
                             <Image
                                 src={event.image_url}
@@ -242,122 +228,131 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                         </div>
 
                         {/* About Section */}
-                        <section className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-800">
-                            <div className="flex items-center gap-2 mb-4">
-                                <Info className="text-indigo-500 w-5 h-5" />
-                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">About the Event</h2>
-                            </div>
+                        <section>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">About the Event</h2>
                             <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                                 {event.description}
                             </p>
                         </section>
 
-                        {/* Seat Selection Section */}
+                        {/* Cast Section */}
+                        {event.cast && event.cast.length > 0 && (
+                            <section>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Cast</h2>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                                    {event.cast.map((actor, idx) => (
+                                        <div key={idx} className="text-center group">
+                                            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md group-hover:shadow-lg transition-all ring-2 ring-transparent group-hover:ring-indigo-500">
+                                                <Image
+                                                    src={actor.image}
+                                                    alt={actor.name}
+                                                    fill
+                                                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                            </div>
+                                            <h3 className="font-bold text-gray-900 dark:text-white text-sm">{actor.name}</h3>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">as {actor.role}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Crew Section */}
+                        {event.crew && event.crew.length > 0 && (
+                            <section>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Crew</h2>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                                    {event.crew.map((member, idx) => (
+                                        <div key={idx} className="text-center group">
+                                            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md group-hover:shadow-lg transition-all ring-2 ring-transparent group-hover:ring-indigo-500">
+                                                <Image
+                                                    src={member.image}
+                                                    alt={member.name}
+                                                    fill
+                                                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                            </div>
+                                            <h3 className="font-bold text-gray-900 dark:text-white text-sm">{member.name}</h3>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">{member.role}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Top Reviews (Mock) */}
                         <section>
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Select Seats</h2>
-                                <div className="text-sm font-medium px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-600 dark:text-gray-400">
-                                    Max 10 seats
-                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Top Reviews</h2>
+                                <Button variant="ghost" className="text-red-500">Write a Review</Button>
                             </div>
-
-                            <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
-                                {/* Legend */}
-                                <div className="p-4 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800 flex justify-center gap-6">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
-                                        <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Available</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-indigo-600 rounded-md shadow-md shadow-indigo-500/20"></div>
-                                        <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Selected</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 bg-gray-300 dark:bg-gray-600 opacity-50 cursor-not-allowed rounded-md"></div>
-                                        <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Sold</span>
-                                    </div>
-                                </div>
-
-                                <div className="p-8 md:p-12 relative min-h-[400px] flex justify-center">
-                                    {/* Screen Indicator */}
-                                    <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center opacity-40 pointer-events-none">
-                                        <div className="w-2/3 h-12 bg-gradient-to-t from-gray-200 to-transparent dark:from-gray-800 rounded-t-[50%] transform perspective-3d rotate-x-12"></div>
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mt-2">Screen This Way</span>
-                                    </div>
-
-                                    <div className="pb-16 w-full max-w-3xl z-10">
-                                        <SeatMap
-                                            totalSeats={100}
-                                            occupiedSeats={event.occupied_seats || []}
-                                            selectedSeats={selectedSeats}
-                                            maxSelectable={10}
-                                            onSeatSelect={handleSeatSelect}
-                                            price={event.price}
-                                            eventType={event.event_type}
-                                        />
-                                    </div>
-                                </div>
+                            <div className="space-y-4">
+                                {[1, 2].map((i) => (
+                                    <Card key={i} className="border-0 shadow-sm bg-gray-50 dark:bg-gray-900">
+                                        <CardContent className="p-6">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-xs">
+                                                        U{i}
+                                                    </div>
+                                                    <span className="font-semibold text-gray-900 dark:text-white">User {i}</span>
+                                                </div>
+                                                <div className="flex items-center text-yellow-400 text-sm">
+                                                    <Star className="w-4 h-4 fill-current" />
+                                                    <span className="ml-1 font-medium text-gray-900 dark:text-white">4.{8 - i}</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-gray-600 dark:text-gray-300 text-sm">
+                                                Absolutely loved this! The experience was surreal and worth every penny.
+                                                The sound quality and visuals were top-notch. Highly recommended!
+                                            </p>
+                                            <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
+                                                <button className="flex items-center gap-1 hover:text-gray-900 dark:hover:text-white">
+                                                    <ThumbsUp className="w-3 h-3" /> Helpful (12)
+                                                </button>
+                                                <span>2 days ago</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
                             </div>
                         </section>
                     </div>
 
-                    {/* Right Column: Floating Booking Card */}
+                    {/* Right Column: You might also like */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-24 space-y-6">
-                            <Card className="border-0 shadow-2xl dark:shadow-indigo-900/10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl ring-1 ring-gray-200 dark:ring-gray-800">
-                                <CardContent className="p-6 space-y-6">
-                                    <div>
-                                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Price per Ticket</p>
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-4xl font-black text-gray-900 dark:text-white">₹{event.price}</span>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">You might also like</h3>
+                            <div className="space-y-4">
+                                {/* Mock Recommendations */}
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="group cursor-pointer flex gap-4 items-start" onClick={() => router.push('/')}>
+                                        <div className="relative w-20 h-28 rounded-lg overflow-hidden shrink-0 bg-gray-200">
+                                            {/* Placeholder for similar movies */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-900 dark:text-white group-hover:text-red-500 transition-colors line-clamp-2">
+                                                Trending Event {i}
+                                            </h4>
+                                            <p className="text-xs text-gray-500 mt-1">Action/Thriller</p>
+                                            <div className="flex items-center text-xs font-medium text-gray-900 dark:text-white mt-2">
+                                                <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
+                                                4.5
+                                            </div>
                                         </div>
                                     </div>
+                                ))}
+                            </div>
 
-                                    <div className="space-y-3 pt-4 border-t border-gray-100 dark:border-gray-800">
-                                        {selectedSeats.length > 0 ? (
-                                            <div className="space-y-2 animate-in slide-in-from-top-2 fade-in duration-300">
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-gray-500">Selected ({selectedSeats.length})</span>
-                                                    <span className="font-medium text-gray-900 dark:text-white text-right break-all max-w-[150px]">
-                                                        {selectedSeats.join(', ')}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between items-center text-xl font-bold pt-2 border-t border-gray-100 dark:border-gray-800">
-                                                    <span>Total</span>
-                                                    <span className="text-indigo-600">₹{totalPrice}</span>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="text-center py-4 text-gray-400 text-sm italic">
-                                                Select seats to see total price
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <Button
-                                        size="lg"
-                                        className={cn(
-                                            "w-full h-14 text-lg font-bold rounded-xl transition-all duration-300 transform",
-                                            selectedSeats.length > 0
-                                                ? "bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5"
-                                                : "bg-gray-200 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
-                                        )}
-                                        onClick={handleBook}
-                                        disabled={selectedSeats.length === 0}
-                                    >
-                                        {selectedSeats.length === 0 ? 'Select Seats' : 'Proceed to Book'}
-                                    </Button>
-
-                                    <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
-                                        <div className="flex -space-x-1">
-                                            {[1, 2, 3].map(i => (
-                                                <div key={i} className="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-700 border border-white dark:border-black"></div>
-                                            ))}
-                                        </div>
-                                        <span>100+ people booked recently</span>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            <div className="p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl mt-8">
+                                <h4 className="font-bold text-indigo-900 dark:text-indigo-100 mb-2">Get Updates</h4>
+                                <p className="text-sm text-indigo-700 dark:text-indigo-300 mb-4">
+                                    Subscribe to hear about the latest events and offers.
+                                </p>
+                                <Button className="w-full bg-indigo-600 hover:bg-indigo-700">Subscribe</Button>
+                            </div>
                         </div>
                     </div>
                 </div>
