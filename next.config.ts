@@ -1,16 +1,29 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  async rewrites() {
-    return [
-      //  For Nodejs ts
+  images: {
+    remotePatterns: [
       {
-        source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*',
+        protocol: 'https',
+        hostname: 'image.tmdb.org',
       },
-     
-    ];
+      {
+        protocol: 'https',
+        hostname: 'wallpaperaccess.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'e0.365dm.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.pitchfork.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'in.bmscdn.com',
+      },
+    ],
   },
 };
 

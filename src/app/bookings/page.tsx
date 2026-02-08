@@ -22,6 +22,7 @@ interface Booking {
         date_time: string;
     };
     seat_count: number;
+    seat_numbers?: string[];
     total_amount: number;
     status: string;
     ticket?: Ticket;
@@ -91,6 +92,11 @@ export default function BookingsPage() {
                                     <div className="text-sm font-medium">
                                         {booking.seat_count} Seats • ₹{booking.total_amount}
                                     </div>
+                                    {booking.seat_numbers && booking.seat_numbers.length > 0 && (
+                                        <div className="text-xs text-gray-500 mt-1">
+                                            Seats: <span className="font-semibold text-indigo-600">{booking.seat_numbers.join(', ')}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex flex-col items-end justify-center">
                                     {booking.status === 'CONFIRMED' && (

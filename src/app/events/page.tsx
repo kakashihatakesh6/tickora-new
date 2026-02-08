@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,9 +51,18 @@ function EventList() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
                 <Card key={event.id} className="flex flex-col overflow-hidden">
-                    <div className="aspect-video w-full bg-gray-200 object-cover" >
-                        {/* Placeholder for Image */}
-                        {event.image_url ? <img src={event.image_url} alt={event.title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-gray-500">No Image</div>}
+                    <div className="relative aspect-video w-full bg-gray-200">
+                        {event.image_url ? (
+                            <Image
+                                src={event.image_url}
+                                alt={event.title}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            />
+                        ) : (
+                            <div className="flex h-full items-center justify-center text-gray-500">No Image</div>
+                        )}
                     </div>
                     <CardHeader>
                         <div className="flex justify-between">

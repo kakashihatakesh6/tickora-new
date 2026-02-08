@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation'; // Correct import for App Router
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, MapPin, Ticket as TicketIcon } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import SeatMap from '@/components/SeatMap';
 
 interface Event {
     id: number;
@@ -19,6 +20,7 @@ interface Event {
     price: number;
     available_seats: number;
     image_url: string;
+    occupied_seats?: string[];
 }
 
 export default function EventDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,7 +28,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     const router = useRouter();
     const [event, setEvent] = useState<Event | null>(null);
     const [loading, setLoading] = useState(true);
-    const [seats, setSeats] = useState(1);
+    const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
     const [bookingLoading, setBookingLoading] = useState(false);
 
     useEffect(() => {
@@ -43,6 +45,19 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         fetchEvent();
     }, [id]);
 
+    const handleSeatSelect = (seatId: string) => {
+        setSelectedSeats(prev => {
+            if (prev.includes(seatId)) {
+                return prev.filter(s => s !== seatId);
+            }
+            if (prev.length >= 10) {
+                alert("You can only select up to 10 seats.");
+                return prev;
+            }
+            return [...prev, seatId];
+        });
+    };
+
     const handleBook = async () => {
         // Check auth
         if (!localStorage.getItem('token')) {
@@ -50,12 +65,17 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
             return;
         }
 
+        if (selectedSeats.length === 0) {
+            alert("Please select at least one seat.");
+            return;
+        }
+
         setBookingLoading(true);
         try {
-            // 1. Create Booking
+            // 1. Create Booking with specific seats
             const res = await api.post('/bookings', {
                 event_id: Number(id),
-                seat_count: Number(seats)
+                seat_numbers: selectedSeats // Send array of seat IDs
             });
 
             const { booking, order_id } = res.data;
@@ -84,7 +104,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                     }
                 },
                 prefill: {
-                    name: "User Name", // TODO: Get from context
+                    name: "User Name",
                     email: "user@example.com",
                 },
                 theme: {
@@ -103,69 +123,107 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
         }
     };
 
-    if (loading) return <div className="p-12 text-center">Loading...</div>;
-    if (!event) return <div className="p-12 text-center">Event not found</div>;
+    if (loading) return <div className="p-12 text-center text-gray-500">Loading...</div>;
+    if (!event) return <div className="p-12 text-center text-gray-500">Event not found</div>;
+
+    const totalPrice = event.price * selectedSeats.length;
 
     return (
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                <div className="aspect-square w-full rounded-2xl bg-gray-200 object-cover">
-                    {event.image_url ? <img src={event.image_url} alt={event.title} className="h-full w-full object-cover rounded-2xl" /> : <div className="flex h-full items-center justify-center text-gray-500">No Image</div>}
-                </div>
-                <div className="flex flex-col justify-center space-y-6">
-                    <div>
-                        <span className="text-sm font-semibold uppercase tracking-wider text-indigo-600">{event.event_type}</span>
-                        <h1 className="mt-2 text-4xl font-extrabold text-gray-900">{event.title}</h1>
-                        <p className="mt-4 text-lg text-gray-500">{event.description}</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Event Details */}
+                <div className="lg:col-span-1 space-y-6">
+                    <div className="relative aspect-[3/4] w-full rounded-2xl bg-gray-200 overflow-hidden shadow-xl">
+                        {event.image_url ? (
+                            <Image
+                                src={event.image_url}
+                                alt={event.title}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, 33vw"
+                                priority
+                            />
+                        ) : (
+                            <div className="flex h-full items-center justify-center text-gray-500">No Image</div>
+                        )}
+                        <div className="absolute top-4 left-4">
+                            <span className="px-3 py-1 bg-white/90 backdrop-blur text-indigo-700 text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">
+                                {event.event_type}
+                            </span>
+                        </div>
                     </div>
 
-                    <Card>
-                        <CardContent className="space-y-4 p-6">
-                            <div className="flex items-center text-gray-700">
-                                <Calendar className="mr-3 h-5 w-5 text-indigo-600" />
+                    <div>
+                        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">{event.title}</h1>
+                        <p className="mt-4 text-base text-gray-500 dark:text-gray-400 leading-relaxed">{event.description}</p>
+                    </div>
+
+                    <Card className="border-0 shadow-none bg-gray-50 dark:bg-gray-900/50">
+                        <CardContent className="space-y-4 p-4">
+                            <div className="flex items-center text-gray-700 dark:text-gray-300">
+                                <Calendar className="mr-3 h-5 w-5 text-indigo-500" />
                                 <span className="font-medium">{new Date(event.date_time).toLocaleString()}</span>
                             </div>
-                            <div className="flex items-center text-gray-700">
-                                <MapPin className="mr-3 h-5 w-5 text-indigo-600" />
+                            <div className="flex items-center text-gray-700 dark:text-gray-300">
+                                <MapPin className="mr-3 h-5 w-5 text-indigo-500" />
                                 <span className="font-medium">{event.venue}, {event.city}</span>
                             </div>
-                            <div className="flex items-center text-gray-700">
-                                <TicketIcon className="mr-3 h-5 w-5 text-indigo-600" />
-                                <span className="font-medium">Available Seats: {event.available_seats}</span>
+                            <div className="flex items-center text-gray-700 dark:text-gray-300">
+                                <TicketIcon className="mr-3 h-5 w-5 text-indigo-500" />
+                                <span className="font-medium">Price: <span className="text-indigo-600 font-bold">₹{event.price}</span> / seat</span>
                             </div>
                         </CardContent>
                     </Card>
+                </div>
 
-                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-6">
-                        <div className="mb-4 flex items-center justify-between">
-                            <span className="text-lg font-bold text-gray-900">Price per ticket</span>
-                            <span className="text-2xl font-bold text-indigo-600">₹{event.price}</span>
+                {/* Right Column: Seat Selection */}
+                <div className="lg:col-span-2">
+                    <Card className="h-full border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+                        <div className="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white">
+                            <h2 className="font-bold text-lg">Select Seats</h2>
+                            <span className="text-sm bg-indigo-500/50 px-3 py-1 rounded-full">
+                                {selectedSeats.length > 0 ? `${selectedSeats.length} Selected` : 'Tap to select'}
+                            </span>
                         </div>
 
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <span className="text-sm font-medium">Quantity:</span>
-                                <Input
-                                    type="number"
-                                    min="1"
-                                    max="10"
-                                    value={seats}
-                                    onChange={(e) => setSeats(Number(e.target.value))}
-                                    className="w-24"
-                                />
-                            </div>
-                            <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                                <span className="font-bold text-gray-900">Total</span>
-                                <span className="font-bold text-indigo-600">₹{event.price * seats}</span>
-                            </div>
-                            <Button size="lg" className="w-full" onClick={handleBook} isLoading={bookingLoading} disabled={event.available_seats < seats}>
-                                {event.available_seats === 0 ? 'Sold Out' : 'Proceed to Book'}
-                            </Button>
+                        <div className="p-6 flex-grow bg-gray-50/50 dark:bg-black/20 flex flex-col items-center justify-center">
+                            <SeatMap
+                                totalSeats={100} // Hardcoded for simplified grid demo, ideally event.total_seats
+                                occupiedSeats={event.occupied_seats || []}
+                                selectedSeats={selectedSeats}
+                                maxSelectable={10}
+                                onSeatSelect={handleSeatSelect}
+                                price={event.price}
+                                eventType={event.event_type}
+                            />
                         </div>
-                    </div>
+
+                        {/* Bottom Bar: Action */}
+                        <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Price</p>
+                                    <p className="text-3xl font-bold text-indigo-600">₹{totalPrice}</p>
+                                    {selectedSeats.length > 0 && (
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            Seats: {selectedSeats.join(', ')}
+                                        </p>
+                                    )}
+                                </div>
+                                <Button
+                                    size="lg"
+                                    className="w-full sm:w-auto px-12 h-12 text-lg shadow-indigo-200 dark:shadow-none shadow-lg"
+                                    onClick={handleBook}
+                                    disabled={bookingLoading || selectedSeats.length === 0}
+                                >
+                                    {bookingLoading ? 'Processing...' : `Pay ₹${totalPrice}`}
+                                </Button>
+                            </div>
+                        </div>
+                    </Card>
                 </div>
             </div>
-            {/* Load Razorpay Script */}
+            {/* Load Razorpay Script (keep as backup if layout load fails) */}
             <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
         </main>
     );
