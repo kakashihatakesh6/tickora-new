@@ -6,45 +6,60 @@ import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Info } from 'lucide-react';
 import SeatMap from '@/components/SeatMap';
-import { cn } from '@/lib/utils'; // Assuming cn utility exists
+import { cn } from '@/lib/utils';
 
-interface Event {
+interface MovieShow {
     id: number;
-    title: string;
-    event_type: string;
-    city: string;
+    movieId: number;
     venue: string;
-    date_time: string;
+    city: string;
+    screenNumber: string;
+    dateTime: string;
     price: number;
+    totalSeats: number;
+    availableSeats: number;
+    format: string;
     occupied_seats?: string[];
-    category?: string;
 }
 
-export default function SeatSelectionPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = use(params);
+interface Movie {
+    id: number;
+    title: string;
+    description: string;
+    image_url: string;
+}
+
+export default function MovieSeatSelectionPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: movieId } = use(params);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const time = searchParams.get('time');
-    const dateStr = searchParams.get('date');
+    const showId = searchParams.get('showId');
 
-    const [event, setEvent] = useState<Event | null>(null);
+    const [movie, setMovie] = useState<Movie | null>(null);
+    const [show, setShow] = useState<MovieShow | null>(null);
     const [loading, setLoading] = useState(true);
-    // State now stores objects to track price and tier
     const [selectedSeats, setSelectedSeats] = useState<{ id: string; price: number; tier: string }[]>([]);
 
     useEffect(() => {
-        const fetchEvent = async () => {
+        const fetchData = async () => {
             try {
-                const res = await api.get(`/events/${id}`);
-                setEvent(res.data);
+                // Fetch movie details
+                const movieRes = await api.get(`/movies/${movieId}`);
+                setMovie(movieRes.data);
+
+                // Fetch show details with occupied seats
+                if (showId) {
+                    const showRes = await api.get(`/movie-shows/${showId}`);
+                    setShow(showRes.data);
+                }
             } catch (error) {
-                console.error('Failed to fetch event', error);
+                console.error('Failed to fetch data', error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchEvent();
-    }, [id]);
+        fetchData();
+    }, [movieId, showId]);
 
     const handleSeatSelect = (seatId: string, price: number, tier: string) => {
         setSelectedSeats(prev => {
@@ -65,16 +80,18 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
             alert("Please select at least one seat.");
             return;
         }
-        // Pass seat IDs to checkout
         const seatsParam = selectedSeats.map(s => s.id).join(',');
-        router.push(`/bookings/checkout?eventId=${id}&seats=${seatsParam}`);
+        // Redirect to booking/checkout with showId and bookingType=MOVIE
+        router.push(`/bookings/checkout?eventId=${showId}&seats=${seatsParam}&type=MOVIE`);
     };
 
     if (loading) return <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">Loading...</div>;
-    if (!event) return <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">Event not found</div>;
+    if (!movie || !show) return <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">Show not found</div>;
 
     const totalPrice = selectedSeats.reduce((acc, s) => acc + s.price, 0);
-    const dateDisplay = dateStr ? new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
+    const showTime = new Date(show.dateTime);
+    const dateDisplay = showTime.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
+    const timeDisplay = showTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col font-sans">
@@ -90,19 +107,16 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
                                 {selectedSeats.length > 0 ? `Select ${selectedSeats.length} Seats` : 'Select Seats'}
                             </h1>
                             <div className="text-xs text-blue-100 mt-1 flex items-center gap-1 opacity-90">
-                                <span>{event.title}</span>
-                                {time && (
-                                    <>
-                                        <span>•</span>
-                                        <span className="font-medium">
-                                            {dateDisplay}, {time}
-                                        </span>
-                                    </>
-                                )}
+                                <span>{movie.title}</span>
+                                <span>•</span>
+                                <span className="font-medium">
+                                    {dateDisplay}, {timeDisplay}
+                                </span>
+                                <span>•</span>
+                                <span>{show.format}</span>
                             </div>
                         </div>
                     </div>
-                    {/* More options kebab menu could go here */}
                 </div>
             </header>
 
@@ -111,14 +125,13 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
                 <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center">
                     <div className="w-full max-w-4xl pb-32 pt-8">
                         <SeatMap
-                            totalSeats={100}
-                            occupiedSeats={event.occupied_seats || []}
+                            totalSeats={show.totalSeats}
+                            occupiedSeats={show.occupied_seats || []}
                             selectedSeats={selectedSeats.map(s => s.id)}
                             maxSelectable={10}
                             onSeatSelect={handleSeatSelect}
-                            basePrice={event.price}
-                            eventType={event.event_type}
-                            category={event.category}
+                            basePrice={show.price}
+                            eventType="MOVIE"
                         />
                     </div>
                 </div>
@@ -129,12 +142,10 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
                         <div className="flex flex-col">
                             {selectedSeats.length > 0 ? (
                                 <div className="flex flex-col animate-in fade-in slide-in-from-bottom-2">
-                                    {/* Show the last selected seat details explicitly as per reference */}
                                     <span className="text-xs font-bold text-blue-600 dark:text-blue-400 tracking-wider uppercase mb-0.5">
                                         SEAT {selectedSeats.length}
                                     </span>
                                     <div className="text-2xl font-black text-gray-900 dark:text-white flex items-baseline gap-1">
-                                        {/* Split the ID of the last seat, e.g. H11 -> H 11 */}
                                         <span>{selectedSeats[selectedSeats.length - 1].id.replace(/([A-Z])(\d+)/, '$1 $2')}</span>
                                         {selectedSeats.length > 1 && <span className="text-sm font-normal text-gray-400 ml-1">(+{selectedSeats.length - 1} more)</span>}
                                     </div>
@@ -143,7 +154,7 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-500 mb-0.5">Tickets starting at</span>
                                     <div className="font-bold text-xl text-gray-900 dark:text-white">
-                                        Rs. {event.price}
+                                        ₹{show.price}
                                     </div>
                                 </div>
                             )}
@@ -156,8 +167,7 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
                                 onClick={handleProceed}
                             >
                                 <div className="flex flex-col items-center leading-none gap-1">
-                                    <span>Pay Rs. {totalPrice}</span>
-                                    {/* <span className="text-[10px] font-normal opacity-80">Proceed to Pay</span> */}
+                                    <span>Pay ₹{totalPrice}</span>
                                 </div>
                             </Button>
                         ) : (

@@ -2,6 +2,8 @@
 
 import HeroCarousel from '@/components/HeroCarousel';
 import RecommendedMovies from '@/components/RecommendedMovies';
+import RecommendedSports from '@/components/RecommendedSports';
+import RecommendedEvents from '@/components/RecommendedEvents';
 import SubNavbar from '@/components/SubNavbar';
 
 export default function Home() {
@@ -13,6 +15,12 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Recommended Movies */}
         <RecommendedMovies />
+
+        {/* Recommended Sports */}
+        <RecommendedSports />
+
+        {/* Recommended Events */}
+        <RecommendedEvents />
 
         {/* Add more sections here as needed, like "The Best of Live Events", etc. */}
 

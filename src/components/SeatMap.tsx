@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { Tv, CircleDot } from 'lucide-react';
+import { Check } from 'lucide-react';
+import StadiumSeatMap from './StadiumSeatMap';
 
 interface SeatMapProps {
     totalSeats: number;
     occupiedSeats: string[];
     selectedSeats: string[];
     maxSelectable: number;
-    onSeatSelect: (seatId: string) => void;
-    price: number;
+    onSeatSelect: (seatId: string, price: number, tier: string) => void;
+    basePrice: number;
     eventType: string; // 'MOVIE', 'SPORT', 'CONCERT'
+    category?: string; // 'Cricket', etc.
 }
 
 export default function SeatMap({
@@ -20,113 +22,137 @@ export default function SeatMap({
     selectedSeats,
     maxSelectable,
     onSeatSelect,
-    price,
-    eventType
+    basePrice,
+    eventType,
+    category
 }: SeatMapProps) {
-    // Generate seat layout based on total seats
-    // This is a deterministic generator for visual purposes since we don't have a real map in DB
+    // Generate seat layout
     const layout = useMemo(() => {
-        const rows: { name: string; seats: string[] }[] = [];
+        const rows: { name: string; seats: { id: string; tier: 'PREMIUM' | 'STANDARD'; price: number }[]; gap: number | null }[] = [];
 
-        // Config based on event type
-        let seatsPerRow = 10;
-        if (eventType === 'SPORT' || eventType === 'CONCERT') {
-            seatsPerRow = 20; // Wide stadium style
-        }
+        // Custom layout configuration to match the reference image
+        // Rows A-D: Standard continuous
+        // Rows E-O: Split with a gap
+        const rowConfig = [
+            { name: 'A', count: 14, gap: null, tier: 'PREMIUM' },
+            { name: 'B', count: 14, gap: null, tier: 'PREMIUM' },
+            { name: 'C', count: 14, gap: null, tier: 'PREMIUM' },
+            { name: 'D', count: 14, gap: null, tier: 'PREMIUM' },
+            { name: 'E', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'F', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'G', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'H', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'I', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'J', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'K', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'L', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'M', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'N', count: 12, gap: 6, tier: 'STANDARD' },
+            { name: 'O', count: 14, gap: null, tier: 'STANDARD' }, // Last row continuous often
+        ];
 
-        const numRows = Math.ceil(totalSeats / seatsPerRow);
-
-        // Generate alphanumeric seats: A1, A2... B1, B2...
-        let currentSeatIndex = 0;
-
-        for (let i = 0; i < numRows; i++) {
-            const rowName = String.fromCharCode(65 + i); // A, B, C...
-            const rowSeats: string[] = [];
-
-            for (let j = 1; j <= seatsPerRow; j++) {
-                if (currentSeatIndex >= totalSeats) break;
-                rowSeats.push(`${rowName}${j}`);
-                currentSeatIndex++;
+        rowConfig.forEach(config => {
+            const rowSeats = [];
+            for (let i = 1; i <= config.count; i++) {
+                const tier = config.tier as 'PREMIUM' | 'STANDARD';
+                const price = tier === 'PREMIUM' ? basePrice + 150 : basePrice;
+                rowSeats.push({
+                    id: `${config.name}${i}`,
+                    tier,
+                    price
+                });
             }
-            rows.push({ name: rowName, seats: rowSeats });
-        }
+            rows.push({ ...config, seats: rowSeats });
+        });
 
         return rows;
-    }, [totalSeats, eventType]);
+    }, [basePrice]); // Removed eventType dependency for now to enforce this specific layout
 
-    const isStadium = eventType === 'SPORT' || eventType === 'CONCERT';
+    if (category === 'Cricket') {
+        return (
+            <StadiumSeatMap
+                totalSeats={totalSeats}
+                occupiedSeats={occupiedSeats}
+                selectedSeats={selectedSeats}
+                maxSelectable={maxSelectable}
+                onSeatSelect={onSeatSelect}
+                basePrice={basePrice}
+            />
+        );
+    }
 
     return (
-        <div className="flex flex-col items-center w-full">
-            {/* Screen / Stage Indicator */}
-            <div className="w-full mb-10 flex flex-col items-center">
-                {isStadium ? (
-                    <div className="w-3/4 h-24 border-2 border-green-500/30 bg-green-500/10 rounded-[4rem] flex items-center justify-center mb-4 perspective-1000 group">
-                        <div className="text-green-600 font-bold uppercase tracking-[0.3em] text-sm opacity-50">Field / Stage</div>
+        <div className="flex flex-col items-center w-full select-none">
+            {/* Screen Indicator */}
+            <div className="w-full mb-12 flex flex-col items-center relative">
+                <div className="absolute top-0 w-[80%] h-8 border-t-4 border-blue-200 rounded-[50%] shadow-[0_-10px_20px_-5px_rgba(59,130,246,0.3)]" />
+                <span className="mt-4 text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">Screen</span>
+            </div>
+
+            {/* Seats Grid */}
+            <div className="flex flex-col gap-3 items-center">
+                {layout.map((row) => (
+                    <div key={row.name} className="flex items-center gap-6">
+                        {/* Row Label Left */}
+                        <span className="w-4 text-xs font-medium text-gray-400 text-center">{row.name}</span>
+
+                        <div className="flex items-center gap-2">
+                            {row.seats.map((seat, index) => {
+                                const isOccupied = occupiedSeats.includes(seat.id);
+                                const isSelected = selectedSeats.includes(seat.id);
+
+                                // Calculate if we need a gap before this seat
+                                // Gap logic: if row has a defined gap index, and current index equals that gap
+                                const showGap = row.gap && index === row.gap;
+
+                                return (
+                                    <div key={seat.id} className="flex">
+                                        {showGap && <div className="w-8" />} {/* Visual Gap */}
+
+                                        <button
+                                            onClick={() => !isOccupied && onSeatSelect(seat.id, seat.price, seat.tier)}
+                                            disabled={isOccupied}
+                                            className={cn(
+                                                "relative flex items-center justify-center transition-all duration-200",
+                                                "w-7 h-7 rounded-lg text-[10px]",
+                                                isOccupied
+                                                    ? "bg-gray-200 text-transparent cursor-not-allowed"
+                                                    : isSelected
+                                                        ? "bg-purple-600 text-white shadow-md scale-110 z-10" // Selected: Purple
+                                                        : "bg-blue-100 hover:bg-blue-200 text-transparent border border-blue-200", // Available: Light Blue
+                                            )}
+                                            title={`${seat.id} - ₹${seat.price} (${seat.tier})`}
+                                        >
+                                            {isSelected && <Check className="w-4 h-4" strokeWidth={3} />}
+                                            {/* We don't show numbers inside unselected seats in the reference style, usually only on hover or selected. 
+                                                Reference shows empty boxes for available. */}
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Row Label Right (Optional, sometimes useful) */}
+                        {/* <span className="w-4 text-xs font-medium text-gray-400 text-center">{row.name}</span> */}
                     </div>
-                ) : (
-                    <div className="w-3/4 flex flex-col items-center">
-                        <Tv className="w-12 h-12 text-indigo-200 mb-2 opacity-50" />
-                        <div className="w-full h-2 bg-gradient-to-r from-transparent via-indigo-300 to-transparent shadow-[0_4px_10px_rgba(99,102,241,0.5)] rounded-full mb-2" />
-                        <span className="text-xs uppercase tracking-[0.2em] text-gray-400">Screen</span>
-                    </div>
-                )}
+                ))}
             </div>
 
             {/* Legend */}
-            <div className="flex gap-6 mb-8 text-xs font-medium text-gray-500 dark:text-gray-400">
+            <div className="flex gap-6 mt-12 text-xs font-medium text-gray-500">
                 <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600"></div>
-                    Available
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-md bg-gray-300 dark:bg-gray-700 cursor-not-allowed"></div>
+                    <div className="w-4 h-4 rounded-full bg-gray-200"></div>
                     Occupied
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-md bg-indigo-600 shadow-md"></div>
-                    Selected
+                    <div className="w-4 h-4 rounded-md bg-blue-100 border border-blue-200"></div>
+                    Available
                 </div>
-            </div>
-
-            {/* Seats Container */}
-            <div className="w-full overflow-x-auto pb-12 custom-scrollbar">
-                <div className="min-w-max px-8 flex flex-col gap-3 mx-auto">
-                    {layout.map((row) => (
-                        <div key={row.name} className="flex items-center gap-4 justify-center">
-                            <span className="w-6 text-sm font-bold text-gray-400">{row.name}</span>
-                            <div className={cn(
-                                "flex gap-2",
-                                isStadium ? "gap-1" : "gap-3" // Tighter packing for stadium
-                            )}>
-                                {row.seats.map((seatId) => {
-                                    const isOccupied = occupiedSeats.includes(seatId);
-                                    const isSelected = selectedSeats.includes(seatId);
-
-                                    return (
-                                        <button
-                                            key={seatId}
-                                            onClick={() => !isOccupied && onSeatSelect(seatId)}
-                                            disabled={isOccupied}
-                                            className={cn(
-                                                "relative group transition-all duration-200 ease-out flex items-center justify-center",
-                                                isStadium ? "w-6 h-6 rounded-sm text-[0.5rem]" : "w-8 h-8 rounded-lg text-xs",
-                                                isOccupied
-                                                    ? "bg-gray-200 dark:bg-gray-700 text-transparent cursor-not-allowed"
-                                                    : isSelected
-                                                        ? "bg-indigo-600 text-white shadow-lg scale-110 z-10"
-                                                        : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 hover:shadow-md text-gray-500 dark:text-gray-400"
-                                            )}
-                                            title={`Seat ${seatId} - ₹${price}`}
-                                        >
-                                            {/* Tooltip style number for stadium, visible number for cinema */}
-                                            {(!isStadium || isSelected) && seatId.replace(row.name, '')}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    ))}
+                <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-md bg-purple-600 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                    </div>
+                    Selected
                 </div>
             </div>
         </div>

@@ -60,7 +60,7 @@ function CheckoutContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const eventId = searchParams.get('eventId');
-    // ... (omitting unchanged parts to focus on replace block target)
+    const bookingType = searchParams.get('type') || 'EVENT'; // Default to EVENT for backward compatibility
 
     const seatsParam = searchParams.get('seats');
 
@@ -83,11 +83,19 @@ function CheckoutContent() {
 
         const fetchEvent = async () => {
             try {
-                const res = await api.get(`/events/${eventId}`);
+                // Fetch from the appropriate endpoint based on booking type
+                let endpoint = '/events';
+                if (bookingType === 'MOVIE') {
+                    endpoint = '/movie-shows';
+                } else if (bookingType === 'SPORT') {
+                    endpoint = '/sports';
+                }
+
+                const res = await api.get(`${endpoint}/${eventId}`);
                 setEvent(res.data);
-                // Try to prefill user details if available in local storage or profile endpoint
-                // For now, we'll leave it empty or prefill from a mock/auth context if we had one
-                const storedEmail = localStorage.getItem('user_email'); // Example mechanism
+
+                // Try to prefill user details if available in local storage
+                const storedEmail = localStorage.getItem('user_email');
                 if (storedEmail) setFormData(prev => ({ ...prev, email: storedEmail }));
             } catch (error) {
                 console.error('Failed to fetch event', error);
@@ -96,7 +104,7 @@ function CheckoutContent() {
             }
         };
         fetchEvent();
-    }, [eventId]);
+    }, [eventId, bookingType]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -123,15 +131,11 @@ function CheckoutContent() {
         setBookingLoading(true);
 
         try {
-            // 1. Create Booking
+            // 1. Create Booking with appropriate booking type
             const res = await api.post('/bookings', {
                 event_id: Number(eventId),
-                seat_numbers: selectedSeats
-                // Note: The backend might not accept name/email/gst yet if the schema doesn't support it 
-                // in the booking table directly, but we send it for completeness or future support.
-                // If backend throws error on unknown fields, we might need to remove them.
-                // Assuming standard booking endpoint only takes event_id and seat_numbers for now from previous file analysis.
-                // We will use these details for Razorpay prefill.
+                seat_numbers: selectedSeats,
+                bookingType: bookingType // Include the booking type (MOVIE, SPORT, or EVENT)
             });
 
             const { booking, order_id } = res.data;

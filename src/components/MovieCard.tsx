@@ -15,9 +15,10 @@ interface MovieCardProps {
     votes?: string;
     isPromoted?: boolean;
     loading?: boolean;
+    basePath?: string;
 }
 
-export default function MovieCard({ id, title, image, genre, rating, votes, isPromoted, loading }: MovieCardProps) {
+export default function MovieCard({ id, title, image, genre, rating, votes, isPromoted, loading, basePath = '/movies' }: MovieCardProps) {
     if (loading) {
         return (
             <div className="flex flex-col gap-2 w-[220px]">
@@ -29,7 +30,7 @@ export default function MovieCard({ id, title, image, genre, rating, votes, isPr
     }
 
     return (
-        <Link href={`/events/${id}`} className="block group w-[220px] shrink-0">
+        <Link href={`${basePath}/${id}`} className="block group w-[220px] shrink-0">
             <div className="relative rounded-lg overflow-hidden mb-3">
                 <img
                     src={image}
@@ -47,7 +48,7 @@ export default function MovieCard({ id, title, image, genre, rating, votes, isPr
                             <Star className="h-4 w-4 fill-red-500 text-red-500" />
                             <span className="text-sm font-medium">{rating}/10</span>
                         </div>
-                        <span className="text-xs text-gray-300">{votes} Votes</span>
+                        <span className="text-xs text-gray-300">{votes ? votes : 'N/A'}</span>
                     </div>
                 )}
             </div>

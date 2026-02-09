@@ -8,12 +8,12 @@ export default function SubNavbar() {
     const pathname = usePathname();
 
     const links = [
-        { name: 'Movies', href: '/events?category=MOVIE' },
-        { name: 'Stream', href: '/events?category=STREAM' },
-        { name: 'Events', href: '/events?category=CONCERT' },
-        { name: 'Plays', href: '/events?category=PLAY' },
-        { name: 'Sports', href: '/events?category=SPORT' },
-        { name: 'Activities', href: '/events?category=ACTIVITY' },
+        { name: 'Movies', href: '/movies' },
+        { name: 'Stream', href: '/events' },
+        { name: 'Events', href: '/events' },
+        { name: 'Plays', href: '/events' },
+        { name: 'Sports', href: '/sports' },
+        { name: 'Activities', href: '/events' },
     ];
 
     return (
