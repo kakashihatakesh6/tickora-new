@@ -219,7 +219,14 @@ function CheckoutContent() {
         );
     }
 
-    const pricePerSeat = event!.price;
+    let pricePerSeat = event!.price;
+
+    // For Sports, use the price passed from the previous screen (selected stand price)
+    // The backend should also validate this price during booking creation
+    const priceParam = searchParams.get('price');
+    if (bookingType === 'SPORT' && priceParam) {
+        pricePerSeat = Number(priceParam);
+    }
     const seatCount = selectedSeats.length;
     const subtotal = pricePerSeat * seatCount;
     // const convenienceFee = Math.ceil(subtotal * 0.02);

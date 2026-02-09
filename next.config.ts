@@ -43,6 +43,22 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'www.wimbledon.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'documents.iplt20.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.t20worldcup.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'commons.wikimedia.org',
+      },
     ],
   },
   async rewrites() {
