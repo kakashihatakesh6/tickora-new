@@ -4,13 +4,11 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Calendar, MapPin, Clock, Armchair, Download, ArrowLeft, Share2 } from 'lucide-react';
+import { Download, ChevronDown, XCircle, Phone } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-
-interface TicketPageProps { }
+import { Share2 } from 'lucide-react';
 
 export default function TicketPage() {
     const params = useParams();
@@ -28,7 +26,6 @@ export default function TicketPage() {
                 setBooking(res.data);
             } catch (error) {
                 console.error('Failed to fetch booking', error);
-                // Handle error (e.g., redirect or show message)
             } finally {
                 setLoading(false);
             }
@@ -42,8 +39,8 @@ export default function TicketPage() {
 
         try {
             const canvas = await html2canvas(ticketRef.current, {
-                scale: 2, // Improve quality
-                useCORS: true, // For images
+                scale: 2,
+                useCORS: true,
                 backgroundColor: '#ffffff'
             });
 
@@ -67,134 +64,131 @@ export default function TicketPage() {
         }
     };
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center">Loading ticket...</div>;
-    if (!booking) return <div className="min-h-screen flex items-center justify-center">Ticket not found.</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-100">Loading ticket...</div>;
+    if (!booking) return <div className="min-h-screen flex items-center justify-center bg-gray-100">Ticket not found.</div>;
 
     const eventDate = new Date(booking.event.date_time);
-    const dateStr = eventDate.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const timeStr = eventDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = eventDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    const timeStr = eventDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    const language = booking.event.language || 'Hindi';
+    const format = booking.event.format || '2D';
+    const screen = booking.event.screen_number || 'AUDI 2';
+    const ticketLevel = booking.event.ticket_level || 'CLASSIC';
     const uniqueCode = booking.ticket?.unique_code || `BM-${booking.id}`;
 
     return (
-        <main className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto space-y-8">
-                {/* Header Actions */}
-                <div className="flex items-center justify-between">
-                    <Button variant="ghost" onClick={() => router.back()} className="gap-2">
-                        <ArrowLeft className="w-4 h-4" /> Back
-                    </Button>
-                    <div className="flex gap-3">
-                        <Button variant="outline" size="icon">
-                            <Share2 className="w-4 h-4" />
-                        </Button>
-                        <Button onClick={handleDownloadPDF} disabled={downloading} className="gap-2 bg-indigo-600 hover:bg-indigo-700">
-                            <Download className="w-4 h-4" />
-                            {downloading ? 'Generating PDF...' : 'Download PDF'}
-                        </Button>
-                    </div>
-                </div>
+        <main className="min-h-screen bg-gray-100 py-8 px-4 flex flex-col items-center font-sans text-gray-900">
 
-                {/* Ticket View Area (Captured for PDF) - Using inline styles for colors to avoid html2canvas issues with Tailwind v4 lab/oklch colors */}
-                <div ref={ticketRef} style={{ backgroundColor: '#ffffff', color: '#000000', borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid #e5e7eb' }} className="shadow-2xl">
-                    {/* Event Image Banner */}
-                    <div className="h-64 relative">
-                        {booking.event.image_url && (
+            {/* Header Actions */}
+            <div className="w-full max-w-sm flex justify-between items-center mb-6">
+                <Button variant="ghost" onClick={() => router.back()} className="text-gray-600 hover:text-gray-900">
+                    &larr; Back
+                </Button>
+                <Button onClick={handleDownloadPDF} disabled={downloading} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 shadow-sm rounded-full px-4 h-8 text-xs">
+                    <Download className="w-3 h-3" />
+                    {downloading ? 'Saving...' : 'Download'}
+                </Button>
+            </div>
+
+            {/* Ticket Card Container */}
+            <div className="w-full max-w-sm">
+                {/* Visual Capture Area */}
+                <div ref={ticketRef} style={{ backgroundColor: '#ffffff', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', position: 'relative', marginBottom: '24px' }}>
+
+                    {/* Top Section: Movie Details */}
+                    <div style={{ padding: '16px', display: 'flex', gap: '16px', position: 'relative' }}>
+                        {/* Poster */}
+                        <div style={{ width: '80px', height: '120px', flexShrink: 0 }}>
                             <img
                                 src={`/api/image-proxy?url=${encodeURIComponent(booking.event.image_url)}`}
                                 alt={booking.event.title}
-                                className="w-full h-full object-cover"
                                 crossOrigin="anonymous"
-                                style={{ display: 'block' }} // Ensure no weird spacing
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
                             />
-                        )}
-                        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #111827, rgba(17, 24, 39, 0.4), transparent)' }}></div>
-                        <div className="absolute bottom-6 left-8 text-white">
-                            <span style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255, 255, 255, 0.1)' }} className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 inline-block">
-                                Official Ticket
-                            </span>
-                            <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2 drop-shadow-lg" style={{ color: '#ffffff', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{booking.event.title}</h1>
-                            <p className="flex items-center font-medium text-lg" style={{ color: '#e5e7eb' }}>
-                                <Calendar className="w-5 h-5 mr-2" /> {dateStr} • {timeStr}
-                            </p>
+                        </div>
+
+                        {/* Info */}
+                        <div style={{ flex: 1, fontFamily: 'sans-serif' }}>
+                            <h2 style={{ fontSize: '16px', fontWeight: '700', margin: '0 0 4px 0', color: '#000', lineHeight: '1.2' }}>{booking.event.title}</h2>
+                            <p style={{ fontSize: '12px', color: '#666', margin: '0 0 8px 0' }}>{language}, {format}</p>
+                            <p style={{ fontSize: '12px', color: '#333', margin: '0 0 2px 0' }}>{dateStr} | {timeStr}</p>
+                            <p style={{ fontSize: '12px', color: '#666', margin: '0' }}>{booking.event.venue}</p>
+                        </div>
+
+                        {/* M-Ticket Vertical Label */}
+                        <div style={{ position: 'absolute', right: '-8px', top: '30px', transform: 'rotate(-90deg)', transformOrigin: 'center', fontSize: '10px', color: '#e5e7eb', letterSpacing: '1px', fontWeight: 'bold' }}>
+                            M-TICKET
                         </div>
                     </div>
 
-                    {/* Ticket Content */}
-                    <div className="p-8 md:p-10 relative" style={{ backgroundColor: '#ffffff' }}>
-                        {/* Perforation Line - Visual only */}
-                        <div className="absolute -top-3 left-0 w-full flex items-center justify-between z-10 px-2">
+                    {/* Divider with Cutouts */}
+                    <div style={{ position: 'relative', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' }}>
+                        <div style={{ width: '24px', height: '24px', backgroundColor: '#f3f4f6', borderRadius: '50%', position: 'absolute', left: '-12px' }}></div>
+                        <div style={{ width: '100%', borderTop: '2px dashed #e5e7eb', margin: '0 12px' }}></div>
+                        <div style={{ width: '24px', height: '24px', backgroundColor: '#f3f4f6', borderRadius: '50%', position: 'absolute', right: '-12px' }}></div>
+                    </div>
+
+                    {/* Bottom Section: QR & Seat Info */}
+                    <div style={{ padding: '20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        {/* QR Code */}
+                        <div style={{ width: '100px', height: '100px', flexShrink: 0 }}>
+                            <QRCodeCanvas
+                                value={JSON.stringify({ id: booking.id, code: uniqueCode })}
+                                size={100}
+                                level={"M"}
+                            />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                            {/* Left Info Column */}
-                            <div className="md:col-span-2 space-y-8">
-                                <div className="grid grid-cols-2 gap-8">
-                                    <div className="space-y-2">
-                                        <p className="text-xs uppercase tracking-wider font-semibold flex items-center" style={{ color: '#6b7280' }}>
-                                            <MapPin className="w-3 h-3 mr-1.5" /> Venue
-                                        </p>
-                                        <p className="text-lg font-bold leading-tight" style={{ color: '#111827' }}>
-                                            {booking.event.venue}
-                                        </p>
-                                        <p className="text-sm" style={{ color: '#6b7280' }}>{booking.event.city}</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <p className="text-xs uppercase tracking-wider font-semibold flex items-center" style={{ color: '#6b7280' }}>
-                                            <Armchair className="w-3 h-3 mr-1.5" /> Seats
-                                        </p>
-                                        <p className="text-lg font-bold break-words" style={{ color: '#4f46e5' }}>
-                                            {booking.seat_numbers?.join(', ') || `${booking.seat_count} Seats`}
-                                        </p>
-                                        <p className="text-sm" style={{ color: '#6b7280' }}>{booking.seat_count} Ticket(s)</p>
-                                    </div>
-                                </div>
+                        {/* Seat Details */}
+                        <div style={{ flex: 1, paddingLeft: '20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
+                            <p style={{ fontSize: '12px', color: '#666', margin: '0 0 8px 0' }}>{booking.seat_count} Ticket(s)</p>
+                            <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', color: '#000', textTransform: 'uppercase' }}>{screen}</h3>
+                            <p style={{ fontSize: '13px', color: '#666', margin: '0 0 12px 0' }}>{ticketLevel} - <span style={{ fontWeight: 'bold', color: '#000' }}>{booking.seat_numbers?.join(', ')}</span></p>
 
-                                <div className="pt-6 border-t border-dashed" style={{ borderColor: '#e5e7eb' }}>
-                                    <div className="grid grid-cols-2 gap-8">
-                                        <div className="space-y-1">
-                                            <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: '#6b7280' }}>Booking ID</p>
-                                            <p className="font-mono font-medium" style={{ color: '#111827' }}>{booking.id}</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: '#6b7280' }}>Total Paid</p>
-                                            <p className="font-medium" style={{ color: '#111827' }}>₹{booking.total_amount}</p>
-                                        </div>
-                                    </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div style={{ fontSize: '10px', fontWeight: 'bold', color: '#333' }}>
+                                    BOOKING ID: {booking.id}
                                 </div>
-                                <div className="p-4 rounded-xl text-xs" style={{ backgroundColor: '#f9fafb', color: '#6b7280' }}>
-                                    <p className="mb-2 font-bold uppercase tracking-wide">Important Information</p>
-                                    <ul className="list-disc pl-4 space-y-1">
-                                        <li>Please arrive at the venue 30 minutes before the show.</li>
-                                        <li>Present this QR code at the entrance for scanning.</li>
-                                        <li>Tickets once booked cannot be cancelled or refunded.</li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            {/* Right QR Column */}
-                            <div className="flex flex-col items-center justify-center border-l md:border-l md:pl-10 pt-6 md:pt-0" style={{ borderColor: '#f3f4f6' }}>
-                                <div className="p-4 rounded-2xl shadow-sm border mb-4" style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
-                                    <QRCodeCanvas
-                                        value={JSON.stringify({
-                                            id: booking.id,
-                                            code: uniqueCode,
-                                            event: booking.event.id
-                                        })}
-                                        size={180}
-                                        level={"H"}
-                                    />
-                                </div>
-                                <p className="text-xs text-center font-mono tracking-widest mb-1" style={{ color: '#9ca3af' }}>TICKET ID</p>
-                                <p className="text-sm font-bold text-center font-mono tracking-wider" style={{ color: '#111827' }}>{uniqueCode}</p>
+                                <p style={{ fontSize: '9px', color: '#999', marginTop: '2px' }}>Tap to see more</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <p className="text-center text-sm text-gray-500">
-                    Need help? Contact support at <a href="#" className="text-indigo-600 hover:underline">support@ticketmaster.com</a>
-                </p>
+                {/* Footer Content */}
+                <div className="mt-4 text-center px-2">
+                    <p className="text-xs text-gray-500 mb-8 mx-auto leading-relaxed">
+                        A confirmation is sent on e-mail/SMS/WhatsApp within 15 minutes of booking.
+                    </p>
+
+                    <div className="flex justify-around items-center mb-8 border-t border-gray-200 pt-6">
+                        <button className="flex flex-col items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors">
+                            <XCircle className="w-5 h-5" />
+                            <span className="text-[10px] font-medium uppercase tracking-wide">Cancel booking</span>
+                        </button>
+                        <button className="flex flex-col items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors">
+                            <Phone className="w-5 h-5" />
+                            <span className="text-[10px] font-medium uppercase tracking-wide">Contact support</span>
+                        </button>
+                    </div>
+                </div>
             </div>
+
+            {/* Total Amount Footer Bar */}
+            <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                <div className="max-w-sm mx-auto flex justify-between items-center cursor-pointer">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Amount</span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-base font-bold text-gray-900">Rs. {booking.total_amount}</span>
+                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Spacer */}
+            <div className="h-16"></div>
+
         </main>
     );
 }

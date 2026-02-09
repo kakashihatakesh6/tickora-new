@@ -6,6 +6,7 @@ import api from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, MapPin, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TicketModal } from '@/components/ui/ticket-modal';
 
 interface Ticket {
     id: number;
@@ -32,6 +33,7 @@ export default function BookingsPage() {
     const router = useRouter();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -42,14 +44,6 @@ export default function BookingsPage() {
             }
 
             try {
-                // Need to add this endpoint on backend or filter on client if generic GET /bookings returns user specific
-                // Assuming POST /bookings/my or GET /bookings returns user's bookings. 
-                // Let's assume GET /bookings returns user bookings for now? 
-                // Wait, I didn't implement GET /bookings for user in backend yet!
-                // I only added handlers.CreateBooking and handlers.VerifyPayment.
-                // I need to implement handlers.GetUserBookings
-
-                // For now, I'll write the frontend assuming the endpoint exists: GET /bookings/my
                 const res = await api.get('/bookings/my');
                 setBookings(res.data || []);
             } catch (error) {
@@ -103,7 +97,7 @@ export default function BookingsPage() {
                                         <Button
                                             variant="outline"
                                             className="flex items-center gap-2"
-                                            onClick={() => router.push(`/tickets/${booking.id}`)}
+                                            onClick={() => setSelectedBooking(booking)}
                                         >
                                             <QrCode className="h-4 w-4" /> View Ticket
                                         </Button>
@@ -117,6 +111,13 @@ export default function BookingsPage() {
                     <div className="text-center text-gray-500 py-12">No bookings found.</div>
                 )}
             </div>
+
+            {/* Ticket Modal */}
+            <TicketModal
+                isOpen={!!selectedBooking}
+                onClose={() => setSelectedBooking(null)}
+                booking={selectedBooking}
+            />
         </main>
     );
 }
