@@ -28,10 +28,13 @@ interface Booking {
     ticket?: Ticket;
 }
 
+import { TicketModal } from '@/components/ui/ticket-modal';
+
 export default function BookingsPage() {
     const router = useRouter();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -100,7 +103,11 @@ export default function BookingsPage() {
                                 </div>
                                 <div className="flex flex-col items-end justify-center">
                                     {booking.status === 'CONFIRMED' && (
-                                        <Button variant="outline" className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            className="flex items-center gap-2"
+                                            onClick={() => setSelectedBooking(booking)}
+                                        >
                                             <QrCode className="h-4 w-4" /> View Ticket
                                         </Button>
                                     )}
@@ -113,6 +120,12 @@ export default function BookingsPage() {
                     <div className="text-center text-gray-500 py-12">No bookings found.</div>
                 )}
             </div>
+
+            <TicketModal
+                isOpen={!!selectedBooking}
+                onClose={() => setSelectedBooking(null)}
+                booking={selectedBooking}
+            />
         </main>
     );
 }

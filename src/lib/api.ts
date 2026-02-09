@@ -33,7 +33,7 @@ const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<
             }
         }
 
-        const error = new Error(data?.message || 'API Error') as any;
+        const error = new Error(data?.error || data?.message || 'API Error') as any;
         error.response = result;
         
         console.error('API Error:', {

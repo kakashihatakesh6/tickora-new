@@ -152,8 +152,9 @@ function CheckoutContent() {
                             razorpay_signature: response.razorpay_signature
                         });
                         router.push('/bookings');
-                    } catch (verifyError) {
-                        alert('Payment verification failed!');
+                    } catch (verifyError: any) {
+                        const message = verifyError.message || 'Payment verification failed!';
+                        alert(message);
                         console.error(verifyError);
                     }
                 },
@@ -166,6 +167,11 @@ function CheckoutContent() {
                     color: "#4f46e5"
                 }
             };
+
+            if (!window.Razorpay) {
+                alert("Razorpay SDK failed to load. Please check your internet connection.");
+                return;
+            }
 
             const rzp1 = new window.Razorpay(options);
             rzp1.open();
