@@ -309,6 +309,11 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                 </div>
 
                 <style jsx global>{`
+                    body {
+                        overflow: hidden;
+                        margin: 0;
+                        padding: 0;
+                    }
                     .no-scrollbar::-webkit-scrollbar {
                         display: none;
                     }
@@ -319,87 +324,127 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                 `}</style>
             </header>
 
-            <main className="pt-28 pb-24 flex h-screen overflow-hidden bg-gray-100">
+            <main className="pt-[0px] flex h-screen overflow-hidden bg-gray-100 no-scrollbar">
                 {/* Sidebar - Left */}
-                <aside className="w-80 border-r border-gray-200 bg-white p-4 hidden lg:flex flex-col gap-6 overflow-y-auto no-scrollbar">
-                    {/* Match Info Card */}
-                    <div className="flex items-center gap-3">
-                        {sport.team1_flag && <Image src={sport.team1_flag} alt={sport.team1} width={48} height={48} className="object-contain" />}
-                        <span className="text-sm font-bold text-gray-400">vs</span>
-                        {sport.team2_flag && <Image src={sport.team2_flag} alt={sport.team2} width={48} height={48} className="object-contain" />}
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold leading-tight mb-2">
-                            {sport.team1} vs {sport.team2} - {sport.title}
-                        </h2>
-                    </div>
-
-                    <div className="text-xs text-gray-500 italic">
-                        Click on individual seats within blocks to select them.
-                    </div>
-
-                    {/* Ticket Count Selector */}
-                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
-                        <div className="flex items-center gap-2 mb-3 text-purple-900 font-bold text-sm">
-                            <Users className="w-4 h-4" />
-                            <span>Select Tickets</span>
+                <aside className="w-80 border-r border-gray-200 bg-white px-4 pb-4 mb-4 hidden lg:flex flex-col h-full overflow-hidden">
+                    {/* Top Section - Match Info */}
+                    <div className="py-2 border-b border-gray-100">
+                        <div className="flex items-center gap-3 mb-1">
+                            {sport.team1_flag && <Image src={sport.team1_flag} alt={sport.team1} width={32} height={32} className="object-contain" />}
+                            <span className="text-xs font-bold text-gray-400 uppercase">vs</span>
+                            {sport.team2_flag && <Image src={sport.team2_flag} alt={sport.team2} width={32} height={32} className="object-contain" />}
                         </div>
-                        <div className="flex gap-2">
-                            {[1, 2, 4, 6, 8, 10].map((num) => (
-                                <button
-                                    key={num}
-                                    onClick={() => {
-                                        setTicketCount(num);
-                                        setSelectedSeats([]);
-                                    }}
-                                    className={cn(
-                                        "w-8 h-8 rounded-lg text-xs font-bold transition-all",
-                                        ticketCount === num
-                                            ? "bg-purple-600 text-white shadow-md shadow-purple-200"
-                                            : "bg-white text-gray-600 border border-gray-200 hover:border-purple-300"
-                                    )}
-                                >
-                                    {num}
-                                </button>
+                        <h2 className="text-base font-bold leading-tight">
+                            {sport.team1} vs {sport.team2}
+                        </h2>
+                        <p className="text-xs text-gray-500 mt-0.5">{sport.title}</p>
+                    </div>
+
+                    {/* Middle Section - Scrollable Content */}
+                    <div className="flex-1 py-1 space-y-2 overflow-y-auto no-scrollbar">
+                        <div className="text-[9px] text-gray-500 italic">
+                            Click on seats to select
+                        </div>
+
+                        {/* Ticket Count Selector */}
+                        <div className="p-2 bg-purple-50 rounded-lg border border-purple-100">
+                            <div className="flex items-center gap-2 mb-1.5 text-purple-900 font-bold text-xs">
+                                <Users className="w-3 h-3" />
+                                <span>Select Tickets</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                                {[1, 2, 4, 6, 8, 10].map((num) => (
+                                    <button
+                                        key={num}
+                                        onClick={() => {
+                                            setTicketCount(num);
+                                            setSelectedSeats([]);
+                                        }}
+                                        className={cn(
+                                            "w-7 h-7 rounded-lg text-[10px] font-bold transition-all",
+                                            ticketCount === num
+                                                ? "bg-purple-600 text-white shadow-md shadow-purple-200"
+                                                : "bg-white text-gray-600 border border-gray-200 hover:border-purple-300"
+                                        )}
+                                    >
+                                        {num}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Price Legend */}
+                        <div className="space-y-0.5">
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1 px-1">Price Legend</p>
+                            {SEAT_CATEGORIES.map((cat) => (
+                                <div key={cat.id} className="flex items-center justify-between p-1.5 hover:bg-gray-50 cursor-pointer rounded-lg border border-transparent transition-all group">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-2.5 h-2.5 rounded-sm ${cat.color} opacity-80 group-hover:opacity-100 transition-opacity shadow-sm`}></div>
+                                        <span className={`text-xs font-bold ${cat.color.replace('bg-', 'text-')}`}>{cat.label}</span>
+                                    </div>
+                                </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* Price Legend */}
-                    <div className="space-y-1">
-                        {SEAT_CATEGORIES.map((cat) => (
-                            <div key={cat.id} className="flex items-center justify-between p-2 hover:bg-gray-50 cursor-pointer rounded-lg border border-transparent transition-all group">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-3 h-3 rounded-sm ${cat.color} opacity-80 group-hover:opacity-100 transition-opacity shadow-sm`}></div>
-                                    <span className={`text-sm font-bold ${cat.color.replace('bg-', 'text-')}`}>{cat.label}</span>
-                                </div>
+                    {/* Bottom Section - Fixed Booking */}
+                    <div className="mt-auto border-t border-gray-100 mb-28 pt-1.5 bg-white">
+                        <div className="mb-1.5">
+                            <div className="flex items-center justify-between mb-1.5">
+                                <p className="text-xs font-bold text-gray-800">Selected Seats</p>
+                                <span className="text-[10px] font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+                                    {selectedSeats.length}/{ticketCount}
+                                </span>
                             </div>
-                        ))}
+                            <div className="p-2 border rounded-lg bg-gray-50/50 shadow-sm border-gray-100">
+                                {selectedSeats.length > 0 ? (
+                                    <>
+                                        <div className="flex flex-wrap gap-1 mb-1.5 max-h-12 overflow-y-auto no-scrollbar">
+                                            {selectedSeats.map(seat => (
+                                                <span key={seat} className="px-1.5 py-0.5 bg-purple-600 text-white text-[9px] font-bold rounded">
+                                                    {seat}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <div className="flex items-center justify-between pt-1.5 border-t border-gray-200 gap-2">
+                                            <div className="flex flex-col min-w-0">
+                                                <span className="text-base font-black text-gray-900 leading-none truncate">
+                                                    ₹{(() => {
+                                                        const firstSeat = selectedSeats[0];
+                                                        const block = STADIUM_BLOCKS.find(b =>
+                                                            firstSeat.startsWith(b.name.replace('Block ', ''))
+                                                        );
+                                                        return (block?.price || 0) * selectedSeats.length;
+                                                    })().toLocaleString()}
+                                                </span>
+                                                <span className="text-[8px] text-gray-500 mt-0 uppercase font-bold tracking-tighter">Total Payable</span>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                className={cn(
+                                                    "bg-red-500 hover:bg-red-600 text-white font-bold h-8 px-3 text-xs rounded-lg transition-all shadow-md active:scale-[0.98] whitespace-nowrap",
+                                                    (selectedSeats.length === 0 || isBooking) && "opacity-50 cursor-not-allowed shadow-none"
+                                                )}
+                                                disabled={selectedSeats.length === 0 || isBooking}
+                                                onClick={handleBook}
+                                            >
+                                                {isBooking ? '...' : 'Book Now'}
+                                            </Button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="py-1.5 text-center">
+                                        <span className="text-gray-400 text-[11px] font-medium italic">Select seats to proceed</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Selected Seats Info */}
-                    <div className="mt-auto border-t pt-4">
-                        <p className="text-sm font-bold mb-2 text-gray-800">Selected Seats ({selectedSeats.length}/{ticketCount})</p>
-                        {selectedSeats.length > 0 ? (
-                            <div className="p-4 border rounded-lg bg-gray-50 shadow-sm">
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                    {selectedSeats.map(seat => (
-                                        <span key={seat} className="px-2 py-1 bg-purple-600 text-white text-xs font-bold rounded">
-                                            {seat}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="p-4 border border-dashed rounded-lg text-center">
-                                <span className="text-gray-400 text-sm">Click seats on the map</span>
-                            </div>
-                        )}
-                    </div>
                 </aside>
 
                 {/* Main Content - Stadium Map */}
-                <section className="flex-1 relative overflow-hidden flex items-center justify-center p-4 sm:p-8 select-none no-scrollbar">
+                <section className="flex-1 relative overflow-hidden flex items-center justify-center p-0 select-none no-scrollbar">
                     <div className="relative w-full h-full flex items-center justify-center overflow-auto no-scrollbar">
                         {/* Stadium SVG Container */}
                         <motion.div
@@ -514,66 +559,29 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                         </motion.div>
                     </div>
 
-                    {/* Zoom Controls */}
-                    <div className="absolute bottom-8 right-8 flex flex-col gap-3">
+                    {/* Zoom Controls - Top Right */}
+                    <div className="absolute top-4 right-4 flex flex-col gap-3 z-30">
                         <Button
                             variant="outline"
                             size="icon"
-                            className="bg-white rounded-full shadow-lg h-10 w-10 hover:bg-gray-50 border-gray-200"
+                            className="bg-white rounded-full shadow-lg h-9 w-9 hover:bg-gray-50 border-gray-200"
                             onClick={handleZoomIn}
                             disabled={zoom >= 6}
                         >
-                            <ZoomIn className="w-5 h-5 text-gray-700" />
+                            <ZoomIn className="w-4 h-4 text-gray-700" />
                         </Button>
                         <Button
                             variant="outline"
                             size="icon"
-                            className="bg-white rounded-full shadow-lg h-10 w-10 hover:bg-gray-50 border-gray-200"
+                            className="bg-white rounded-full shadow-lg h-9 w-9 hover:bg-gray-50 border-gray-200"
                             onClick={handleZoomOut}
                             disabled={zoom <= 0.5}
                         >
-                            <ZoomOut className="w-5 h-5 text-gray-700" />
+                            <ZoomOut className="w-4 h-4 text-gray-700" />
                         </Button>
                     </div>
                 </section>
             </main>
-
-            {/* Bottom Booking Bar */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-50 shadow-lg">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div>
-                        {selectedSeats.length > 0 ? (
-                            <div className="flex flex-col">
-                                <span className="text-2xl font-bold text-gray-900">
-                                    ₹{(() => {
-                                        const firstSeat = selectedSeats[0];
-                                        const block = STADIUM_BLOCKS.find(b =>
-                                            firstSeat.startsWith(b.name.replace('Block ', ''))
-                                        );
-                                        return (block?.price || 0) * selectedSeats.length;
-                                    })()}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                    {selectedSeats.join(', ')}
-                                </span>
-                            </div>
-                        ) : (
-                            <span className="text-gray-400 text-sm">Select seats to proceed</span>
-                        )}
-                    </div>
-                    <Button
-                        size="lg"
-                        className={cn(
-                            "bg-red-500 hover:bg-red-600 text-white font-bold px-12 py-6 text-lg rounded-lg transition-all",
-                            (selectedSeats.length === 0 || isBooking) && "opacity-50 cursor-not-allowed"
-                        )}
-                        disabled={selectedSeats.length === 0 || isBooking}
-                        onClick={handleBook}
-                    >
-                        {isBooking ? 'Booking...' : 'Book'}
-                    </Button>
-                </div>
-            </div>
         </div>
     );
 }
