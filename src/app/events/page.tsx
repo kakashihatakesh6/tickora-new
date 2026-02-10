@@ -3,11 +3,14 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Music } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
+import { ChevronDown, ChevronUp, Search, SlidersHorizontal } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface Event {
     id: number;
@@ -17,11 +20,99 @@ interface Event {
     city: string;
     venue: string;
     date_time: string;
+    dateTime?: string; // Fallback
     price: number;
     image_url: string;
+    category?: string;
 }
 
-function EventList() {
+const CATEGORIES = ['Concert', 'Comedy', 'Theater', 'Festival', 'Workshop', 'Exhibition', 'Conference', 'Meetup'];
+
+function FilterSection({ title, children, defaultOpen = false }: { title: string, children: React.ReactNode, defaultOpen?: boolean }) {
+    const [isOpen, setIsOpen] = useState(defaultOpen);
+
+    return (
+        <div className="border-b border-gray-100 dark:border-gray-800 py-4">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center justify-between w-full text-left mb-2 group"
+            >
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-red-500 transition-colors flex items-center gap-2">
+                    {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    {title}
+                </span>
+                <span className="text-xs text-gray-400 font-normal cursor-pointer hover:underline">Clear</span>
+            </button>
+            {isOpen && (
+                <div className="pt-2 animate-in slide-in-from-top-2 duration-200">
+                    {children}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function EventCard({ event }: { event: Event }) {
+    // Handle both date keys just in case
+    const dateStr = event.dateTime || event.date_time || new Date().toISOString();
+    const date = new Date(dateStr);
+
+    // Format: "Wed, 11 Feb onwards"
+    const dateFormatted = date.toLocaleDateString('en-GB', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short'
+    });
+
+    return (
+        <Link href={`/events/${event.id}`} className="group block h-full">
+            <div className="flex flex-col h-full rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-900">
+                {/* Image Container */}
+                <div className="relative aspect-[2/3] w-full overflow-hidden bg-gray-100">
+                    <Image
+                        src={event.image_url}
+                        alt={event.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+
+                    {/* Overlay Date */}
+                    <div className="absolute bottom-0 left-0 w-full bg-black/60 backdrop-blur-sm text-white px-3 py-2 text-xs font-medium">
+                        {dateFormatted} onwards
+                    </div>
+
+                    {/* Event Type Tag */}
+                    {event.event_type && (
+                        <div className="absolute top-2 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase">
+                            {event.event_type}
+                        </div>
+                    )}
+                </div>
+
+                {/* Content */}
+                <div className="p-3 flex flex-col flex-grow space-y-2">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-base line-clamp-2 leading-tight group-hover:text-red-500 transition-colors">
+                        {event.title}
+                    </h3>
+
+                    <div className="flex items-start text-xs text-gray-500 dark:text-gray-400">
+                        <span className="line-clamp-1">{event.venue}: {event.city}</span>
+                    </div>
+
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {event.category || event.event_type}
+                    </div>
+
+                    <div className="pt-1 mt-auto font-medium text-sm text-gray-900 dark:text-gray-100">
+                        ₹ {event.price} onwards
+                    </div>
+                </div>
+            </div>
+        </Link>
+    );
+}
+
+function EventsPageContent() {
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -29,7 +120,6 @@ function EventList() {
         const fetchEvents = async () => {
             setLoading(true);
             try {
-                // Fetch strictly events (concerts, etc)
                 const res = await api.get('/events');
                 setEvents(res.data || []);
             } catch (error) {
@@ -41,85 +131,112 @@ function EventList() {
         fetchEvents();
     }, []);
 
-    if (loading) {
-        return (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {[...Array(6)].map((_, i) => (
-                    <div key={i} className="h-[400px] bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse" />
-                ))}
-            </div>
-        );
-    }
-
     return (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => (
-                <Card key={event.id} className="group flex flex-col overflow-hidden border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div className="relative aspect-[16/9] w-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                        <Image
-                            src={event.image_url}
-                            alt={event.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-3 left-3">
-                            <span className="px-2.5 py-1 bg-purple-600/90 text-white backdrop-blur text-xs font-bold uppercase tracking-wider rounded-md shadow-sm">
-                                {event.event_type}
-                            </span>
-                        </div>
-                    </div>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-xl font-bold line-clamp-1 text-gray-900 dark:text-white group-hover:text-purple-600 transition-colors">
-                            {event.title}
-                        </CardTitle>
-                        <CardDescription className="line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
-                            {event.description}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow space-y-3 py-2">
-                        <div className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
-                            <Calendar className="mr-2 h-4 w-4 text-purple-500" />
-                            {new Date(event.date_time).toLocaleDateString(undefined, {
-                                weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                            })}
-                        </div>
-                        <div className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
-                            <MapPin className="mr-2 h-4 w-4 text-purple-500" />
-                            <span className="line-clamp-1">{event.venue}, {event.city}</span>
-                        </div>
-                    </CardContent>
-                    <CardFooter className="pt-2 pb-6">
-                        <Link href={`/events/${event.id}`} className="w-full">
-                            <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-                                Book Now
-                            </Button>
-                        </Link>
-                    </CardFooter>
-                </Card>
-            ))}
-            {events.length === 0 && (
-                <div className="col-span-full py-20 text-center">
-                    <h3 className="text-lg font-semibold">No events found</h3>
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+            {/* Sidebar Filters */}
+            <aside className="w-full lg:w-64 flex-shrink-0 bg-white dark:bg-black lg:sticky lg:top-24 hidden lg:block">
+                <div className="mb-4">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Filters</h2>
                 </div>
-            )}
+
+                <div className="bg-white dark:bg-black rounded-lg">
+                    <FilterSection title="Date" defaultOpen={true}>
+                        <div className="space-y-3 px-1">
+                            {['Today', 'Tomorrow', 'This Weekend'].map((label) => (
+                                <Button
+                                    key={label}
+                                    variant="outline"
+                                    className="w-full justify-start text-red-500 border-red-100 hover:bg-red-50 hover:text-red-600 text-sm h-8 font-normal"
+                                >
+                                    {label}
+                                </Button>
+                            ))}
+                            <div className="flex items-center gap-2 pt-2">
+                                <Checkbox id="date-range" />
+                                <label htmlFor="date-range" className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer">Date Range</label>
+                            </div>
+                        </div>
+                    </FilterSection>
+
+                    <FilterSection title="Categories">
+                        <div className="space-y-2 px-1">
+                            {CATEGORIES.slice(0, 5).map((cat) => (
+                                <div key={cat} className="flex items-center gap-2">
+                                    <Checkbox id={`cat-${cat}`} />
+                                    <label htmlFor={`cat-${cat}`} className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer w-full hover:text-red-500">{cat}</label>
+                                </div>
+                            ))}
+                        </div>
+                    </FilterSection>
+
+                    <FilterSection title="More Filters">
+                        <div className="px-1 text-sm text-gray-400">Additional filters...</div>
+                    </FilterSection>
+
+                    <FilterSection title="Price">
+                        <div className="px-1 text-sm text-gray-400">Price range...</div>
+                    </FilterSection>
+
+                    <Button variant="outline" className="w-full mt-6 text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600">
+                        Browse by Venues
+                    </Button>
+                </div>
+            </aside>
+
+            {/* Main Content */}
+            <div className="flex-1 w-full">
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Events In Mumbai</h1>
+
+                    {/* Category Chips */}
+                    <div className="flex flex-wrap gap-3 mb-6">
+                        {CATEGORIES.map((cat) => (
+                            <Badge
+                                key={cat}
+                                variant="outline"
+                                className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900"
+                            >
+                                {cat}
+                            </Badge>
+                        ))}
+                    </div>
+                </div>
+
+                {loading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="aspect-[2/3] bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse" />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {events.map((event) => (
+                            <EventCard key={event.id} event={event} />
+                        ))}
+                        {events.length === 0 && (
+                            <div className="col-span-full py-20 text-center text-gray-500">
+                                No events found.
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+            {/* Mobile Filter Button (visible only on small screens) */}
+            <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+                <Button className="rounded-full shadow-xl px-6 bg-red-600 hover:bg-red-700 text-white">
+                    <SlidersHorizontal className="mr-2 h-4 w-4" /> Filters
+                </Button>
+            </div>
         </div>
     );
 }
 
 export default function EventsPage() {
     return (
-        <main className="min-h-screen bg-gray-50 dark:bg-black pt-8 pb-16 px-4 sm:px-6 lg:px-8">
+        <main className="min-h-screen bg-gray-50 dark:bg-black/50 pt-8 pb-16 px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
-                <div className="mb-10 text-center sm:text-left border-b border-gray-200 dark:border-gray-800 pb-6">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl mb-2">
-                        Live Events
-                    </h1>
-                    <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl">
-                        Concerts, comedy, and more.
-                    </p>
-                </div>
                 <Suspense fallback={<div>Loading...</div>}>
-                    <EventList />
+                    <EventsPageContent />
                 </Suspense>
             </div>
         </main>
