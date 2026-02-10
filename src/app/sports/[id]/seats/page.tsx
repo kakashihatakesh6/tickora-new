@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Search, ZoomIn, ZoomOut } from 'lucide-react';
+import { ChevronLeft, Search, ZoomIn, ZoomOut, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 // Define seat categories and prices
 const SEAT_CATEGORIES = [
@@ -157,7 +158,7 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
     const [sport, setSport] = useState<Sport | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-    const [ticketCount, setTicketCount] = useState(1);
+    const [ticketCount, setTicketCount] = useState(10);
     const [timeLeft, setTimeLeft] = useState(240); // 4 minutes
     const [isBooking, setIsBooking] = useState(false);
     const [zoom, setZoom] = useState(1);
@@ -253,7 +254,7 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
             const angleStep = angleSpan / (seatsPerRow + 1);
             const angle = block.startAngle + ((angularIndex + 1) * angleStep);
 
-            const pos = polarToCartesian(450, 450, radius, angle);
+            const pos = polarToCartesian(500, 500, radius, angle);
 
             seats.push(
                 <circle
@@ -306,11 +307,21 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                 <div className="bg-purple-900 text-white text-center text-sm py-2 font-medium sticky top-16 z-40">
                     You have approximately <span className="font-bold text-pink-300">{Math.ceil(timeLeft / 60)} minutes</span> to select your seats.
                 </div>
+
+                <style jsx global>{`
+                    .no-scrollbar::-webkit-scrollbar {
+                        display: none;
+                    }
+                    .no-scrollbar {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                    }
+                `}</style>
             </header>
 
-            <main className="pt-28 pb-24 flex h-screen overflow-hidden">
+            <main className="pt-28 pb-24 flex h-screen overflow-hidden bg-gray-100">
                 {/* Sidebar - Left */}
-                <aside className="w-80 border-r border-gray-200 bg-white p-4 hidden lg:flex flex-col gap-6 overflow-y-auto">
+                <aside className="w-80 border-r border-gray-200 bg-white p-4 hidden lg:flex flex-col gap-6 overflow-y-auto no-scrollbar">
                     {/* Match Info Card */}
                     <div className="flex items-center gap-3">
                         {sport.team1_flag && <Image src={sport.team1_flag} alt={sport.team1} width={48} height={48} className="object-contain" />}
@@ -327,13 +338,40 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                         Click on individual seats within blocks to select them.
                     </div>
 
+                    {/* Ticket Count Selector */}
+                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                        <div className="flex items-center gap-2 mb-3 text-purple-900 font-bold text-sm">
+                            <Users className="w-4 h-4" />
+                            <span>Select Tickets</span>
+                        </div>
+                        <div className="flex gap-2">
+                            {[1, 2, 4, 6, 8, 10].map((num) => (
+                                <button
+                                    key={num}
+                                    onClick={() => {
+                                        setTicketCount(num);
+                                        setSelectedSeats([]);
+                                    }}
+                                    className={cn(
+                                        "w-8 h-8 rounded-lg text-xs font-bold transition-all",
+                                        ticketCount === num
+                                            ? "bg-purple-600 text-white shadow-md shadow-purple-200"
+                                            : "bg-white text-gray-600 border border-gray-200 hover:border-purple-300"
+                                    )}
+                                >
+                                    {num}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Price Legend */}
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                         {SEAT_CATEGORIES.map((cat) => (
-                            <div key={cat.id} className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer rounded-lg border border-transparent hover:border-gray-200 transition-all group">
+                            <div key={cat.id} className="flex items-center justify-between p-2 hover:bg-gray-50 cursor-pointer rounded-lg border border-transparent transition-all group">
                                 <div className="flex items-center gap-3">
-                                    <div className={`w-4 h-4 rounded-sm ${cat.color} opacity-80 group-hover:opacity-100 transition-opacity shadow-sm`}></div>
-                                    <span className={`font-bold ${cat.color.replace('bg-', 'text-')}`}>{cat.label}</span>
+                                    <div className={`w-3 h-3 rounded-sm ${cat.color} opacity-80 group-hover:opacity-100 transition-opacity shadow-sm`}></div>
+                                    <span className={`text-sm font-bold ${cat.color.replace('bg-', 'text-')}`}>{cat.label}</span>
                                 </div>
                             </div>
                         ))}
@@ -361,11 +399,22 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                 </aside>
 
                 {/* Main Content - Stadium Map */}
-                <section className="flex-1 bg-gray-100 relative overflow-hidden flex items-center justify-center p-8 select-none">
-                    <div className="relative w-full h-full flex items-center justify-center overflow-auto">
-                        {/* Stadium SVG */}
-                        <div style={{ transform: `scale(${zoom})`, transition: 'transform 0.3s ease' }}>
-                            <svg viewBox="0 0 900 900" className="w-[90%] h-[90%] drop-shadow-2xl max-w-3xl">
+                <section className="flex-1 relative overflow-hidden flex items-center justify-center p-4 sm:p-8 select-none no-scrollbar">
+                    <div className="relative w-full h-full flex items-center justify-center overflow-auto no-scrollbar">
+                        {/* Stadium SVG Container */}
+                        <motion.div
+                            drag
+                            dragConstraints={{ left: -500 * zoom, right: 500 * zoom, top: -500 * zoom, bottom: 500 * zoom }}
+                            dragElastic={0.1}
+                            dragMomentum={true}
+                            style={{
+                                scale: zoom,
+                                cursor: zoom > 1 ? 'grab' : 'default'
+                            }}
+                            whileDrag={{ cursor: 'grabbing' }}
+                            className="flex items-center justify-center min-w-full min-h-full"
+                        >
+                            <svg viewBox="0 0 1000 1000" className="w-[95%] h-[95%] drop-shadow-2xl max-w-4xl overflow-visible">
                                 <defs>
                                     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
                                         <feGaussianBlur stdDeviation="2" result="blur" />
@@ -374,45 +423,50 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                 </defs>
 
                                 {/* Ground */}
-                                <circle cx="450" cy="450" r="180" fill="#15803d" stroke="#166534" strokeWidth="5" />
+                                <circle cx="500" cy="500" r="180" fill="#15803d" stroke="#166534" strokeWidth="5" />
                                 {/* Pitch */}
-                                <rect x="435" y="380" width="30" height="140" fill="#e5e7eb" rx="2" />
-                                <rect x="448" y="385" width="4" height="130" fill="#d1d5db" />
+                                <rect x="485" y="430" width="30" height="140" fill="#e5e7eb" rx="2" />
+                                <rect x="498" y="435" width="4" height="130" fill="#d1d5db" />
 
-                                {/* Blocks */}
+                                {/* Block Paths Layer */}
                                 {STADIUM_BLOCKS.map((block) => {
-                                    const categoryColor = SEAT_CATEGORIES.find(c => c.id === block.category)?.color.replace('bg-', '') || 'gray-400';
-                                    const path = describeSector(450, 450, block.rInner, block.rOuter, block.startAngle + 1, block.endAngle - 1);
-
+                                    const path = describeSector(500, 500, block.rInner, block.rOuter, block.startAngle + 1, block.endAngle - 1);
                                     return (
-                                        <g key={block.id}>
-                                            <path
-                                                d={path}
-                                                fill="#e5e7eb"
-                                                stroke="white"
-                                                strokeWidth="1"
-                                                className="transition-all duration-300 ease-out"
-                                            />
+                                        <path
+                                            key={`path-${block.id}`}
+                                            d={path}
+                                            fill="#e5e7eb"
+                                            stroke="white"
+                                            strokeWidth="1"
+                                            className="transition-all duration-300 ease-out"
+                                        />
+                                    );
+                                })}
+
+                                {/* Block Content Layer (Labels & Seats) */}
+                                {STADIUM_BLOCKS.map((block) => {
+                                    return (
+                                        <g key={`content-${block.id}`}>
                                             {/* Block Label */}
                                             {(() => {
                                                 const angle = (block.startAngle + block.endAngle) / 2;
-                                                // Position label at outer edge of block to avoid overlap with seats
-                                                const labelRadius = block.rOuter + 8;
-                                                const labelPos = polarToCartesian(450, 450, labelRadius, angle);
+                                                // Position label just outside or "below" the block
+                                                const labelRadius = block.rOuter + 12;
+                                                const labelPos = polarToCartesian(500, 500, labelRadius, angle);
                                                 return (
                                                     <text
                                                         x={labelPos.x}
                                                         y={labelPos.y}
                                                         textAnchor="middle"
                                                         dominantBaseline="middle"
-                                                        fill="#374151"
-                                                        fontSize="7"
-                                                        fontWeight="600"
+                                                        fill="#4b5563"
+                                                        fontSize="10"
+                                                        fontWeight="900"
                                                         className="pointer-events-none select-none"
                                                         style={{
                                                             transformOrigin: `${labelPos.x}px ${labelPos.y}px`,
                                                             transform: `rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}deg)`,
-                                                            opacity: zoom > 1.5 ? 1 : 0.7
+                                                            opacity: zoom > 1.1 ? 1 : 0.6
                                                         }}
                                                     >
                                                         {block.name.replace('Block ', '')}
@@ -431,8 +485,8 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                     const startAngle = Math.min(...standBlocks.map(b => b.startAngle));
                                     const endAngle = Math.max(...standBlocks.map(b => b.endAngle));
                                     const angle = (startAngle + endAngle) / 2;
-                                    // Position labels far outside to avoid overlap with third tier
-                                    const labelPos = polarToCartesian(450, 450, 460, angle);
+                                    // Position labels outside the top tier (which ends at rOuter 440)
+                                    const labelPos = polarToCartesian(500, 500, 475, angle);
 
                                     return (
                                         <text
@@ -441,45 +495,45 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                             y={labelPos.y}
                                             textAnchor="middle"
                                             dominantBaseline="middle"
-                                            fill="#9ca3af"
-                                            fontSize="10"
-                                            fontWeight="600"
-                                            className="pointer-events-none select-none uppercase tracking-wider"
+                                            fill="#4b5563"
+                                            fontSize="14"
+                                            fontWeight="800"
+                                            className="pointer-events-none select-none uppercase tracking-widest"
                                             style={{
                                                 transformOrigin: `${labelPos.x}px ${labelPos.y}px`,
                                                 transform: `rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}deg)`,
-                                                opacity: zoom < 2 ? 0.8 : 0.3
+                                                opacity: zoom < 3 ? 1 : 0.6
                                             }}
                                         >
-                                            {standName.replace(' Pavilion', '').replace(' Stand', '')}
+                                            {standName.toUpperCase()}
                                         </text>
                                     );
                                 })}
-                            
-                            </svg>
-                        </div>
 
-                        {/* Zoom Controls */}
-                        <div className="absolute bottom-8 right-8 flex flex-col gap-3">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="bg-white rounded-full shadow-lg h-10 w-10 hover:bg-gray-50 border-gray-200"
-                                onClick={handleZoomIn}
-                                disabled={zoom >= 6}
-                            >
-                                <ZoomIn className="w-5 h-5 text-gray-700" />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="bg-white rounded-full shadow-lg h-10 w-10 hover:bg-gray-50 border-gray-200"
-                                onClick={handleZoomOut}
-                                disabled={zoom <= 0.5}
-                            >
-                                <ZoomOut className="w-5 h-5 text-gray-700" />
-                            </Button>
-                        </div>
+                            </svg>
+                        </motion.div>
+                    </div>
+
+                    {/* Zoom Controls */}
+                    <div className="absolute bottom-8 right-8 flex flex-col gap-3">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="bg-white rounded-full shadow-lg h-10 w-10 hover:bg-gray-50 border-gray-200"
+                            onClick={handleZoomIn}
+                            disabled={zoom >= 6}
+                        >
+                            <ZoomIn className="w-5 h-5 text-gray-700" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="bg-white rounded-full shadow-lg h-10 w-10 hover:bg-gray-50 border-gray-200"
+                            onClick={handleZoomOut}
+                            disabled={zoom <= 0.5}
+                        >
+                            <ZoomOut className="w-5 h-5 text-gray-700" />
+                        </Button>
                     </div>
                 </section>
             </main>
@@ -520,6 +574,6 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                     </Button>
                 </div>
             </div>
-        </div >
+        </div>
     );
 }
