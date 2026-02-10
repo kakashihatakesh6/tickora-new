@@ -44,36 +44,101 @@ const describeSector = (x: number, y: number, rInner: number, rOuter: number, st
 
 // Define the stadium layout with granular blocks
 const STADIUM_BLOCKS = [
+    // ========== INNER LAYER (Lower Tier) ==========
     // North Stand (Top/North) - centered around 0
-    { id: 'NS-A', name: 'Block A', price: 400, category: 'pink', startAngle: 330, endAngle: 345, rInner: 220, rOuter: 380, stand: 'North Stand' },
-    { id: 'NS-B', name: 'Block B', price: 400, category: 'pink', startAngle: 345, endAngle: 360, rInner: 220, rOuter: 380, stand: 'North Stand' },
-    { id: 'NS-C', name: 'Block C', price: 400, category: 'pink', startAngle: 0, endAngle: 15, rInner: 220, rOuter: 380, stand: 'North Stand' },
-    { id: 'NS-D', name: 'Block D', price: 400, category: 'pink', startAngle: 15, endAngle: 30, rInner: 220, rOuter: 380, stand: 'North Stand' },
+    { id: 'NS-A', name: 'Block A', price: 400, category: 'pink', startAngle: 330, endAngle: 345, rInner: 220, rOuter: 300, stand: 'North Stand', layer: 'lower', seats: 50 },
+    { id: 'NS-B', name: 'Block B', price: 400, category: 'pink', startAngle: 345, endAngle: 360, rInner: 220, rOuter: 300, stand: 'North Stand', layer: 'lower', seats: 50 },
+    { id: 'NS-C', name: 'Block C', price: 400, category: 'pink', startAngle: 0, endAngle: 15, rInner: 220, rOuter: 300, stand: 'North Stand', layer: 'lower', seats: 50 },
+    { id: 'NS-D', name: 'Block D', price: 400, category: 'pink', startAngle: 15, endAngle: 30, rInner: 220, rOuter: 300, stand: 'North Stand', layer: 'lower', seats: 50 },
 
     // Sunil Gavaskar Pavilion (East)
-    { id: 'SG-E', name: 'Block E', price: 1000, category: 'gold', startAngle: 35, endAngle: 55, rInner: 220, rOuter: 350, stand: 'Sunil Gavaskar Pavilion' },
-    { id: 'SG-F', name: 'Block F', price: 1000, category: 'gold', startAngle: 55, endAngle: 75, rInner: 220, rOuter: 350, stand: 'Sunil Gavaskar Pavilion' },
-    { id: 'SG-G', name: 'Block G', price: 1000, category: 'gold', startAngle: 75, endAngle: 95, rInner: 220, rOuter: 350, stand: 'Sunil Gavaskar Pavilion' },
+    { id: 'SG-E', name: 'Block E', price: 1000, category: 'gold', startAngle: 35, endAngle: 55, rInner: 220, rOuter: 290, stand: 'Sunil Gavaskar Pavilion', layer: 'lower', seats: 50 },
+    { id: 'SG-F', name: 'Block F', price: 1000, category: 'gold', startAngle: 55, endAngle: 75, rInner: 220, rOuter: 290, stand: 'Sunil Gavaskar Pavilion', layer: 'lower', seats: 50 },
+    { id: 'SG-G', name: 'Block G', price: 1000, category: 'gold', startAngle: 75, endAngle: 95, rInner: 220, rOuter: 290, stand: 'Sunil Gavaskar Pavilion', layer: 'lower', seats: 50 },
 
     // Vijay Merchant Pavilion (South East)
-    { id: 'VM-H', name: 'Block H', price: 750, category: 'blue', startAngle: 100, endAngle: 115, rInner: 220, rOuter: 320, stand: 'Vijay Merchant Pavilion' },
-    { id: 'VM-I', name: 'Block I', price: 750, category: 'blue', startAngle: 115, endAngle: 130, rInner: 220, rOuter: 320, stand: 'Vijay Merchant Pavilion' },
+    { id: 'VM-H', name: 'Block H', price: 750, category: 'blue', startAngle: 100, endAngle: 115, rInner: 220, rOuter: 280, stand: 'Vijay Merchant Pavilion', layer: 'lower', seats: 50 },
+    { id: 'VM-I', name: 'Block I', price: 750, category: 'blue', startAngle: 115, endAngle: 130, rInner: 220, rOuter: 280, stand: 'Vijay Merchant Pavilion', layer: 'lower', seats: 50 },
 
     // MCA Pavilion (South)
-    { id: 'MCA-J', name: 'Block J', price: 750, category: 'blue', startAngle: 135, endAngle: 165, rInner: 220, rOuter: 320, stand: 'MCA Pavilion' },
-    { id: 'MCA-K', name: 'Block K', price: 750, category: 'blue', startAngle: 165, endAngle: 195, rInner: 220, rOuter: 320, stand: 'MCA Pavilion' },
+    { id: 'MCA-J', name: 'Block J', price: 750, category: 'blue', startAngle: 135, endAngle: 165, rInner: 220, rOuter: 280, stand: 'MCA Pavilion', layer: 'lower', seats: 50 },
+    { id: 'MCA-K', name: 'Block K', price: 750, category: 'blue', startAngle: 165, endAngle: 195, rInner: 220, rOuter: 280, stand: 'MCA Pavilion', layer: 'lower', seats: 50 },
 
     // Divecha Pavilion (South West)
-    { id: 'DP-L', name: 'Block L', price: 500, category: 'blue', startAngle: 200, endAngle: 220, rInner: 220, rOuter: 320, stand: 'Divecha Pavilion' },
+    { id: 'DP-L', name: 'Block L', price: 500, category: 'blue', startAngle: 200, endAngle: 220, rInner: 220, rOuter: 280, stand: 'Divecha Pavilion', layer: 'lower', seats: 50 },
 
     // Sachin Tendulkar Pavilion (West)
-    { id: 'ST-M', name: 'Block M', price: 2000, category: 'platinum', startAngle: 225, endAngle: 245, rInner: 220, rOuter: 350, stand: 'Sachin Tendulkar Pavilion' },
-    { id: 'ST-N', name: 'Block N', price: 2000, category: 'platinum', startAngle: 245, endAngle: 265, rInner: 220, rOuter: 350, stand: 'Sachin Tendulkar Pavilion' },
-    { id: 'ST-O', name: 'Block O', price: 2000, category: 'platinum', startAngle: 265, endAngle: 285, rInner: 220, rOuter: 350, stand: 'Sachin Tendulkar Pavilion' },
+    { id: 'ST-M', name: 'Block M', price: 2000, category: 'platinum', startAngle: 225, endAngle: 245, rInner: 220, rOuter: 290, stand: 'Sachin Tendulkar Pavilion', layer: 'lower', seats: 50 },
+    { id: 'ST-N', name: 'Block N', price: 2000, category: 'platinum', startAngle: 245, endAngle: 265, rInner: 220, rOuter: 290, stand: 'Sachin Tendulkar Pavilion', layer: 'lower', seats: 50 },
+    { id: 'ST-O', name: 'Block O', price: 2000, category: 'platinum', startAngle: 265, endAngle: 285, rInner: 220, rOuter: 290, stand: 'Sachin Tendulkar Pavilion', layer: 'lower', seats: 50 },
 
     // Garware Pavilion (North West)
-    { id: 'GP-P', name: 'Block P', price: 1000, category: 'gold', startAngle: 290, endAngle: 305, rInner: 220, rOuter: 350, stand: 'Garware Pavilion' },
-    { id: 'GP-Q', name: 'Block Q', price: 1000, category: 'gold', startAngle: 305, endAngle: 320, rInner: 220, rOuter: 350, stand: 'Garware Pavilion' },
+    { id: 'GP-P', name: 'Block P', price: 1000, category: 'gold', startAngle: 290, endAngle: 305, rInner: 220, rOuter: 290, stand: 'Garware Pavilion', layer: 'lower', seats: 50 },
+    { id: 'GP-Q', name: 'Block Q', price: 1000, category: 'gold', startAngle: 305, endAngle: 320, rInner: 220, rOuter: 290, stand: 'Garware Pavilion', layer: 'lower', seats: 50 },
+
+    // ========== OUTER LAYER (Upper Tier) ==========
+    // North Stand Upper
+    { id: 'NSU-R', name: 'Block R', price: 300, category: 'pink', startAngle: 330, endAngle: 345, rInner: 310, rOuter: 380, stand: 'North Stand Upper', layer: 'upper', seats: 35 },
+    { id: 'NSU-S', name: 'Block S', price: 300, category: 'pink', startAngle: 345, endAngle: 360, rInner: 310, rOuter: 380, stand: 'North Stand Upper', layer: 'upper', seats: 35 },
+    { id: 'NSU-T', name: 'Block T', price: 300, category: 'pink', startAngle: 0, endAngle: 15, rInner: 310, rOuter: 380, stand: 'North Stand Upper', layer: 'upper', seats: 35 },
+    { id: 'NSU-U', name: 'Block U', price: 300, category: 'pink', startAngle: 15, endAngle: 30, rInner: 310, rOuter: 380, stand: 'North Stand Upper', layer: 'upper', seats: 35 },
+
+    // Sunil Gavaskar Pavilion Upper
+    { id: 'SGU-V', name: 'Block V', price: 800, category: 'gold', startAngle: 35, endAngle: 55, rInner: 300, rOuter: 360, stand: 'Sunil Gavaskar Pavilion Upper', layer: 'upper', seats: 35 },
+    { id: 'SGU-W', name: 'Block W', price: 800, category: 'gold', startAngle: 55, endAngle: 75, rInner: 300, rOuter: 360, stand: 'Sunil Gavaskar Pavilion Upper', layer: 'upper', seats: 35 },
+    { id: 'SGU-X', name: 'Block X', price: 800, category: 'gold', startAngle: 75, endAngle: 95, rInner: 300, rOuter: 360, stand: 'Sunil Gavaskar Pavilion Upper', layer: 'upper', seats: 35 },
+
+    // Vijay Merchant Pavilion Upper
+    { id: 'VMU-Y', name: 'Block Y', price: 600, category: 'blue', startAngle: 100, endAngle: 115, rInner: 290, rOuter: 350, stand: 'Vijay Merchant Pavilion Upper', layer: 'upper', seats: 35 },
+    { id: 'VMU-Z', name: 'Block Z', price: 600, category: 'blue', startAngle: 115, endAngle: 130, rInner: 290, rOuter: 350, stand: 'Vijay Merchant Pavilion Upper', layer: 'upper', seats: 35 },
+
+    // MCA Pavilion Upper
+    { id: 'MCAU-AA', name: 'Block AA', price: 600, category: 'blue', startAngle: 135, endAngle: 165, rInner: 290, rOuter: 350, stand: 'MCA Pavilion Upper', layer: 'upper', seats: 35 },
+    { id: 'MCAU-AB', name: 'Block AB', price: 600, category: 'blue', startAngle: 165, endAngle: 195, rInner: 290, rOuter: 350, stand: 'MCA Pavilion Upper', layer: 'upper', seats: 35 },
+
+    // Divecha Pavilion Upper
+    { id: 'DPU-AC', name: 'Block AC', price: 400, category: 'pink', startAngle: 200, endAngle: 220, rInner: 290, rOuter: 350, stand: 'Divecha Pavilion Upper', layer: 'upper', seats: 35 },
+
+    // Sachin Tendulkar Pavilion Upper
+    { id: 'STU-AD', name: 'Block AD', price: 1500, category: 'platinum', startAngle: 225, endAngle: 245, rInner: 300, rOuter: 360, stand: 'Sachin Tendulkar Pavilion Upper', layer: 'upper', seats: 35 },
+    { id: 'STU-AE', name: 'Block AE', price: 1500, category: 'platinum', startAngle: 245, endAngle: 265, rInner: 300, rOuter: 360, stand: 'Sachin Tendulkar Pavilion Upper', layer: 'upper', seats: 35 },
+    { id: 'STU-AF', name: 'Block AF', price: 1500, category: 'platinum', startAngle: 265, endAngle: 285, rInner: 300, rOuter: 360, stand: 'Sachin Tendulkar Pavilion Upper', layer: 'upper', seats: 35 },
+
+    // Garware Pavilion Upper
+    { id: 'GPU-AG', name: 'Block AG', price: 800, category: 'gold', startAngle: 290, endAngle: 305, rInner: 300, rOuter: 360, stand: 'Garware Pavilion Upper', layer: 'upper', seats: 35 },
+    { id: 'GPU-AH', name: 'Block AH', price: 800, category: 'gold', startAngle: 305, endAngle: 320, rInner: 300, rOuter: 360, stand: 'Garware Pavilion Upper', layer: 'upper', seats: 35 },
+
+    // ========== TOP LAYER (Third Tier) ==========
+    // North Stand Top
+    { id: 'NST-AI', name: 'Block AI', price: 250, category: 'pink', startAngle: 330, endAngle: 345, rInner: 390, rOuter: 440, stand: 'North Stand Top', layer: 'top', seats: 25 },
+    { id: 'NST-AJ', name: 'Block AJ', price: 250, category: 'pink', startAngle: 345, endAngle: 360, rInner: 390, rOuter: 440, stand: 'North Stand Top', layer: 'top', seats: 25 },
+    { id: 'NST-AK', name: 'Block AK', price: 250, category: 'pink', startAngle: 0, endAngle: 15, rInner: 390, rOuter: 440, stand: 'North Stand Top', layer: 'top', seats: 25 },
+    { id: 'NST-AL', name: 'Block AL', price: 250, category: 'pink', startAngle: 15, endAngle: 30, rInner: 390, rOuter: 440, stand: 'North Stand Top', layer: 'top', seats: 25 },
+
+    // Sunil Gavaskar Pavilion Top
+    { id: 'SGT-AM', name: 'Block AM', price: 650, category: 'blue', startAngle: 35, endAngle: 55, rInner: 370, rOuter: 420, stand: 'Sunil Gavaskar Pavilion Top', layer: 'top', seats: 25 },
+    { id: 'SGT-AN', name: 'Block AN', price: 650, category: 'blue', startAngle: 55, endAngle: 75, rInner: 370, rOuter: 420, stand: 'Sunil Gavaskar Pavilion Top', layer: 'top', seats: 25 },
+    { id: 'SGT-AO', name: 'Block AO', price: 650, category: 'blue', startAngle: 75, endAngle: 95, rInner: 370, rOuter: 420, stand: 'Sunil Gavaskar Pavilion Top', layer: 'top', seats: 25 },
+
+    // Vijay Merchant Pavilion Top
+    { id: 'VMT-AP', name: 'Block AP', price: 500, category: 'pink', startAngle: 100, endAngle: 115, rInner: 360, rOuter: 410, stand: 'Vijay Merchant Pavilion Top', layer: 'top', seats: 22 },
+    { id: 'VMT-AQ', name: 'Block AQ', price: 500, category: 'pink', startAngle: 115, endAngle: 130, rInner: 360, rOuter: 410, stand: 'Vijay Merchant Pavilion Top', layer: 'top', seats: 22 },
+
+    // MCA Pavilion Top
+    { id: 'MCAT-AR', name: 'Block AR', price: 500, category: 'pink', startAngle: 135, endAngle: 165, rInner: 360, rOuter: 410, stand: 'MCA Pavilion Top', layer: 'top', seats: 22 },
+    { id: 'MCAT-AS', name: 'Block AS', price: 500, category: 'pink', startAngle: 165, endAngle: 195, rInner: 360, rOuter: 410, stand: 'MCA Pavilion Top', layer: 'top', seats: 22 },
+
+    // Divecha Pavilion Top
+    { id: 'DPT-AT', name: 'Block AT', price: 350, category: 'pink', startAngle: 200, endAngle: 220, rInner: 360, rOuter: 410, stand: 'Divecha Pavilion Top', layer: 'top', seats: 22 },
+
+    // Sachin Tendulkar Pavilion Top
+    { id: 'STT-AU', name: 'Block AU', price: 1200, category: 'gold', startAngle: 225, endAngle: 245, rInner: 370, rOuter: 420, stand: 'Sachin Tendulkar Pavilion Top', layer: 'top', seats: 25 },
+    { id: 'STT-AV', name: 'Block AV', price: 1200, category: 'gold', startAngle: 245, endAngle: 265, rInner: 370, rOuter: 420, stand: 'Sachin Tendulkar Pavilion Top', layer: 'top', seats: 25 },
+    { id: 'STT-AW', name: 'Block AW', price: 1200, category: 'gold', startAngle: 265, endAngle: 285, rInner: 370, rOuter: 420, stand: 'Sachin Tendulkar Pavilion Top', layer: 'top', seats: 25 },
+
+    // Garware Pavilion Top
+    { id: 'GPT-AX', name: 'Block AX', price: 650, category: 'blue', startAngle: 290, endAngle: 305, rInner: 370, rOuter: 420, stand: 'Garware Pavilion Top', layer: 'top', seats: 25 },
+    { id: 'GPT-AY', name: 'Block AY', price: 650, category: 'blue', startAngle: 305, endAngle: 320, rInner: 370, rOuter: 420, stand: 'Garware Pavilion Top', layer: 'top', seats: 25 },
 ];
 
 interface Sport {
@@ -127,7 +192,7 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
     };
 
     const handleZoomIn = () => {
-        setZoom(prev => Math.min(prev + 0.5, 4));
+        setZoom(prev => Math.min(prev + 0.5, 6));
     };
 
     const handleZoomOut = () => {
@@ -166,9 +231,9 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
     const renderSeatsInBlock = (block: typeof STADIUM_BLOCKS[0]) => {
         const blockLetter = block.name.replace('Block ', '');
         const seats = [];
-        const rowCount = 50; // 50 seats per block
+        const rowCount = block.seats || 50; // Use block-specific seat count
         const seatsPerRow = 5; // 5 seats per radial row
-        const radialRows = 10; // 10 radial rows
+        const radialRows = block.layer === 'top' ? 5 : block.layer === 'upper' ? 7 : 10; // 5 rows for top, 7 for upper, 10 for lower
 
         // Calculate positions for seats within the sector
         const angleSpan = block.endAngle - block.startAngle;
@@ -331,20 +396,23 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                             {/* Block Label */}
                                             {(() => {
                                                 const angle = (block.startAngle + block.endAngle) / 2;
-                                                const labelPos = polarToCartesian(450, 450, block.rInner + 10, angle);
+                                                // Position label at outer edge of block to avoid overlap with seats
+                                                const labelRadius = block.rOuter + 8;
+                                                const labelPos = polarToCartesian(450, 450, labelRadius, angle);
                                                 return (
                                                     <text
                                                         x={labelPos.x}
                                                         y={labelPos.y}
                                                         textAnchor="middle"
                                                         dominantBaseline="middle"
-                                                        fill="#6b7280"
-                                                        fontSize="9"
-                                                        fontWeight="bold"
-                                                        className="pointer-events-none"
+                                                        fill="#374151"
+                                                        fontSize="7"
+                                                        fontWeight="600"
+                                                        className="pointer-events-none select-none"
                                                         style={{
                                                             transformOrigin: `${labelPos.x}px ${labelPos.y}px`,
-                                                            transform: `rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}deg)`
+                                                            transform: `rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}deg)`,
+                                                            opacity: zoom > 1.5 ? 1 : 0.7
                                                         }}
                                                     >
                                                         {block.name.replace('Block ', '')}
@@ -358,12 +426,13 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                 })}
 
                                 {/* Stand Labels */}
-                                {Array.from(new Set(STADIUM_BLOCKS.map(b => b.stand))).map((standName) => {
-                                    const standBlocks = STADIUM_BLOCKS.filter(b => b.stand === standName);
+                                {Array.from(new Set(STADIUM_BLOCKS.filter(b => b.layer === 'lower').map(b => b.stand))).map((standName) => {
+                                    const standBlocks = STADIUM_BLOCKS.filter(b => b.stand === standName && b.layer === 'lower');
                                     const startAngle = Math.min(...standBlocks.map(b => b.startAngle));
                                     const endAngle = Math.max(...standBlocks.map(b => b.endAngle));
                                     const angle = (startAngle + endAngle) / 2;
-                                    const labelPos = polarToCartesian(450, 450, 410, angle);
+                                    // Position labels far outside to avoid overlap with third tier
+                                    const labelPos = polarToCartesian(450, 450, 460, angle);
 
                                     return (
                                         <text
@@ -373,18 +442,20 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                             textAnchor="middle"
                                             dominantBaseline="middle"
                                             fill="#9ca3af"
-                                            fontSize="12"
-                                            fontWeight="bold"
-                                            className="pointer-events-none select-none uppercase tracking-widest"
+                                            fontSize="10"
+                                            fontWeight="600"
+                                            className="pointer-events-none select-none uppercase tracking-wider"
                                             style={{
                                                 transformOrigin: `${labelPos.x}px ${labelPos.y}px`,
-                                                transform: `rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}deg)`
+                                                transform: `rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}deg)`,
+                                                opacity: zoom < 2 ? 0.8 : 0.3
                                             }}
                                         >
-                                            {standName}
+                                            {standName.replace(' Pavilion', '').replace(' Stand', '')}
                                         </text>
                                     );
                                 })}
+                            
                             </svg>
                         </div>
 
@@ -395,7 +466,7 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                 size="icon"
                                 className="bg-white rounded-full shadow-lg h-10 w-10 hover:bg-gray-50 border-gray-200"
                                 onClick={handleZoomIn}
-                                disabled={zoom >= 4}
+                                disabled={zoom >= 6}
                             >
                                 <ZoomIn className="w-5 h-5 text-gray-700" />
                             </Button>
@@ -449,6 +520,6 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                     </Button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
