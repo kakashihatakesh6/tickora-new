@@ -68,7 +68,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-black pb-20">
+            <div className="min-h-screen bg-background pb-20">
                 {/* Hero Skeleton */}
                 <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden bg-gray-200 dark:bg-gray-900 animate-pulse">
                     <div className="h-20" /> {/* Navbar Spacer */}
@@ -110,7 +110,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black pb-20">
+        <div className="min-h-screen bg-background pb-20">
             {/* Immersive Hero Section */}
             <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden">
                 {/* Background Image with Blur */}
@@ -123,8 +123,8 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                 />
 
                 {/* Gradient Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-gray-50/60 to-transparent dark:from-black dark:via-black/60 dark:to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
 
                 {/* Navigation and Content Container */}
                 <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">
@@ -242,7 +242,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                                     {event.cast.map((actor, idx) => (
                                         <div key={idx} className="text-center group">
-                                            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md group-hover:shadow-lg transition-all ring-2 ring-transparent group-hover:ring-indigo-500">
+                                            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md group-hover:shadow-2xl transition-all ring-2 ring-transparent group-hover:ring-red-500/50 group-hover:ring-[6px]">
                                                 <Image
                                                     src={actor.image}
                                                     alt={actor.name}
@@ -265,7 +265,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                                     {event.crew.map((member, idx) => (
                                         <div key={idx} className="text-center group">
-                                            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md group-hover:shadow-lg transition-all ring-2 ring-transparent group-hover:ring-indigo-500">
+                                            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md group-hover:shadow-2xl transition-all ring-2 ring-transparent group-hover:ring-red-500/50 group-hover:ring-[6px]">
                                                 <Image
                                                     src={member.image}
                                                     alt={member.name}
@@ -289,7 +289,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
                             </div>
                             <div className="space-y-4">
                                 {[1, 2].map((i) => (
-                                    <Card key={i} className="border-0 shadow-sm bg-gray-50 dark:bg-gray-900">
+                                    <Card key={i} className="border-0 shadow-sm bg-slate-50 dark:bg-slate-900/50">
                                         <CardContent className="p-6">
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center gap-2">

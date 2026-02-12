@@ -75,11 +75,11 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-black pb-20 pt-20 flex justify-center">
+            <div className="min-h-screen bg-background pb-20 pt-20 flex justify-center">
                 <div className="animate-pulse flex flex-col items-center">
-                    <div className="h-64 w-48 bg-gray-200 dark:bg-gray-800 rounded-lg mb-4"></div>
-                    <div className="h-8 w-64 bg-gray-200 dark:bg-gray-800 rounded mb-2"></div>
-                    <div className="h-4 w-48 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                    <div className="h-64 w-48 bg-slate-200 dark:bg-slate-800 rounded-2xl mb-6 shadow-2xl"></div>
+                    <div className="h-10 w-80 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                    <div className="h-5 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
                 </div>
             </div>
         );
@@ -97,13 +97,12 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
     const hasTeams = sport.team1 && sport.team2;
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
-            {/* Header with Back Button */}
-            <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+        <div className="min-h-screen bg-background pb-20">
+            <div className="bg-white dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 sticky top-0 z-20 transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <Button
                         variant="ghost"
-                        className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="text-gray-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
                         onClick={() => router.back()}
                     >
                         <ChevronLeft className="w-4 h-4 mr-1" />
@@ -205,7 +204,7 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
                         )}
 
                         {/* Interest Tracker */}
-                        <Card className="border border-gray-200 dark:border-gray-800">
+                        <Card className="border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 backdrop-blur-sm shadow-sm">
                             <CardContent className="p-4 flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                     <ThumbsUp className="w-4 h-4 text-green-600" />
@@ -229,7 +228,7 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
                         </Card>
 
                         {/* About The Event */}
-                        <Card className="border border-gray-200 dark:border-gray-800">
+                        <Card className="border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 backdrop-blur-sm">
                             <CardContent className="p-6">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">About The Event</h2>
                                 <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -294,21 +293,21 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
                         )}
 
                         {/* M-Ticket */}
-                        <Card className="border border-gray-200 dark:border-gray-800">
+                        <Card className="border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 backdrop-blur-sm">
                             <CardContent className="p-6">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                                     <Ticket className="w-5 h-5 text-purple-600" />
                                     M-Ticket
                                 </h2>
-                                <div className="flex items-start gap-3">
-                                    <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                                        <Ticket className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                                <div className="flex items-start gap-4">
+                                    <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                                        <Ticket className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                        <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
                                             Contactless Ticketing & Paperless Entry with M-ticket
                                         </p>
-                                        <a href="#" className="text-red-600 dark:text-red-500 font-semibold text-sm hover:underline">
+                                        <a href="#" className="text-red-600 dark:text-red-500 font-bold text-sm hover:underline transition-all">
                                             Learn More
                                         </a>
                                     </div>
@@ -331,7 +330,7 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
 
                     {/* Sidebar */}
                     <div className="lg:col-span-1">
-                        <Card className="border border-gray-200 dark:border-gray-800 sticky top-24">
+                        <Card className="border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-24 shadow-xl">
                             <CardContent className="p-6 space-y-4">
                                 {/* Event Details */}
                                 <div className="space-y-3">

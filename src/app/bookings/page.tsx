@@ -58,37 +58,37 @@ export default function BookingsPage() {
     if (loading) return <div className="p-12 text-center">Loading your bookings...</div>;
 
     return (
-        <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-            <h1 className="mb-8 text-3xl font-bold">My Bookings</h1>
-            <div className="space-y-6">
+        <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8 bg-background min-h-screen">
+            <h1 className="mb-10 text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">My Bookings</h1>
+            <div className="space-y-8">
                 {bookings.map((booking) => (
-                    <Card key={booking.id} className="overflow-hidden">
-                        <CardHeader className="bg-gray-50 pb-4">
+                    <Card key={booking.id} className="overflow-hidden border border-slate-100 dark:border-slate-800 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-2xl bg-white dark:bg-slate-900/50 backdrop-blur-sm">
+                        <CardHeader className="bg-slate-50/50 dark:bg-slate-800/20 pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <CardTitle>{booking.event.title}</CardTitle>
-                                    <CardDescription className="mt-1 flex items-center gap-2">
-                                        <Calendar className="h-4 w-4" /> {new Date(booking.event.date_time).toLocaleString()}
+                                    <CardTitle className="text-xl font-bold text-slate-900 dark:text-slate-100">{booking.event.title}</CardTitle>
+                                    <CardDescription className="mt-1 flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                                        <Calendar className="h-4 w-4" /> {new Date(booking.event.date_time).toLocaleString('en-US', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                     </CardDescription>
                                 </div>
-                                <div className={`rounded-full px-3 py-1 text-xs font-bold ${booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                <div className={`rounded-full px-4 py-1.5 text-xs font-bold tracking-wider uppercase shadow-sm ${booking.status === 'CONFIRMED' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                                     }`}>
                                     {booking.status}
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent className="pt-6">
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <div className="flex items-center text-sm text-gray-600">
-                                        <MapPin className="mr-2 h-4 w-4" /> {booking.event.venue}, {booking.event.city}
+                        <CardContent className="pt-8">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                <div className="space-y-4">
+                                    <div className="flex items-center text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                        <MapPin className="mr-3 h-4 w-4 text-red-500" /> {booking.event.venue}, {booking.event.city}
                                     </div>
-                                    <div className="text-sm font-medium">
-                                        {booking.seat_count} Seats • ₹{booking.total_amount}
+                                    <div className="text-base font-bold text-slate-900 dark:text-slate-100">
+                                        {booking.seat_count} Seats • <span className="text-red-600 dark:text-red-500">₹{booking.total_amount}</span>
                                     </div>
                                     {booking.seat_numbers && booking.seat_numbers.length > 0 && (
-                                        <div className="text-xs text-gray-500 mt-1">
-                                            Seats: <span className="font-semibold text-indigo-600">{booking.seat_numbers.join(', ')}</span>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-lg inline-block">
+                                            Seats: <span className="font-bold text-indigo-600 dark:text-indigo-400">{booking.seat_numbers.join(', ')}</span>
                                         </div>
                                     )}
                                 </div>

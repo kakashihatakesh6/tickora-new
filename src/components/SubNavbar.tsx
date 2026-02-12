@@ -17,7 +17,7 @@ export default function SubNavbar() {
     ];
 
     return (
-        <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 hidden md:block">
+        <div className="bg-slate-50 dark:bg-slate-900/50 backdrop-blur-sm border-b border-gray-100 dark:border-slate-800 hidden md:block">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-10 items-center justify-between text-xs sm:text-sm">
                     <div className="flex space-x-6">

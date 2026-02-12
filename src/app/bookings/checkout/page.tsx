@@ -257,7 +257,7 @@ function CheckoutContent() {
 
     if (!eventId || (!loading && !event)) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-black p-4">
+            <div className="min-h-screen flex items-center justify-center bg-background p-4">
                 <div className="text-center max-w-md w-full">
                     <div className="mb-6 mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center">
                         <TicketIcon className="w-8 h-8" />
@@ -272,8 +272,8 @@ function CheckoutContent() {
 
     if (loading) {
         return (
-            <div className="min-h-screen pt-24 flex items-center justify-center bg-gray-50 dark:bg-black">
-                <div className="animate-bounce text-indigo-600 font-medium">Preparing your booking...</div>
+            <div className="min-h-screen pt-24 flex items-center justify-center bg-background">
+                <div className="animate-bounce text-red-600 font-bold tracking-tight">Preparing your booking...</div>
             </div>
         );
     }
@@ -293,11 +293,11 @@ function CheckoutContent() {
     const totalPrice = subtotal;
 
     return (
-        <main className="min-h-screen bg-gray-50 dark:bg-black pt-10 pb-20 px-4 sm:px-6 lg:px-8">
+        <main className="min-h-screen bg-background pt-10 pb-20 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
-                <div className="mb-10 text-center md:text-left">
-                    <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">Checkout</h1>
-                    <p className="text-gray-500 dark:text-gray-400">Complete your details to secure your tickets.</p>
+                <div className="mb-12 text-center md:text-left">
+                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Checkout</h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">Complete your details to secure your tickets.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
@@ -306,7 +306,7 @@ function CheckoutContent() {
                     <div className="lg:col-span-4 order-2 lg:order-1">
                         <div className="sticky top-24 space-y-6">
                             {/* Ticket Card Design */}
-                            <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden relative">
+                            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden relative">
                                 {/* Ticket Design Top */}
                                 <div className="relative h-48">
                                     <Image
@@ -326,10 +326,10 @@ function CheckoutContent() {
                                 </div>
 
                                 {/* Perforation Lines */}
-                                <div className="relative h-6 bg-white dark:bg-gray-900">
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-gray-50 dark:bg-black rounded-r-full"></div>
-                                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-gray-50 dark:bg-black rounded-l-full"></div>
-                                    <div className="border-b-2 border-dashed border-gray-200 dark:border-gray-700 w-full h-full transform translate-y-1/2 opacity-50"></div>
+                                <div className="relative h-6 bg-white dark:bg-slate-900">
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-background rounded-r-full"></div>
+                                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-background rounded-l-full"></div>
+                                    <div className="border-b-2 border-dashed border-slate-200 dark:border-slate-800 w-full h-full transform translate-y-1/2 opacity-50"></div>
                                 </div>
 
                                 {/* Order Details */}
@@ -362,12 +362,12 @@ function CheckoutContent() {
 
                                     <div className="pt-6 border-t border-gray-100 dark:border-gray-800 space-y-3">
                                         <div className="flex justify-between items-center text-sm">
-                                            <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                                            <span className="font-medium">₹{subtotal}</span>
+                                            <span className="text-slate-600 dark:text-slate-400 font-medium">Subtotal</span>
+                                            <span className="font-bold text-slate-900 dark:text-slate-100">₹{subtotal}</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-lg font-bold text-gray-900 dark:text-white pt-2">
-                                            <span>Total Amount</span>
-                                            <span className="text-indigo-600">₹{totalPrice}</span>
+                                        <div className="flex justify-between items-center text-xl font-black text-slate-900 dark:text-white pt-2">
+                                            <span>Total</span>
+                                            <span className="text-red-600 dark:text-red-500">₹{totalPrice}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -463,7 +463,7 @@ function CheckoutContent() {
                                                     id="gst"
                                                     name="gst"
                                                     placeholder="Optional"
-                                                    className="pl-10 h-12 bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-200 rounded-xl transition-all"
+                                                    className="pl-10 h-12 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 focus:border-red-500 focus:ring-red-200 rounded-xl transition-all font-medium"
                                                     value={formData.gst}
                                                     onChange={handleInputChange}
                                                 />

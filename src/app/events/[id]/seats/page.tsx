@@ -70,14 +70,14 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
         router.push(`/bookings/checkout?eventId=${id}&seats=${seatsParam}`);
     };
 
-    if (loading) return <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">Loading...</div>;
-    if (!event) return <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">Event not found</div>;
+    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+    if (!event) return <div className="min-h-screen bg-background flex items-center justify-center">Event not found</div>;
 
     const totalPrice = selectedSeats.reduce((acc, s) => acc + s.price, 0);
     const dateDisplay = dateStr ? new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col font-sans">
+        <div className="min-h-screen bg-background flex flex-col font-sans">
             {/* Header - Purple Gradient */}
             <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -107,7 +107,7 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
             </header>
 
             {/* Seat Map Container */}
-            <main className="flex-1 bg-white dark:bg-gray-900 relative overflow-hidden flex flex-col">
+            <main className="flex-1 bg-background relative overflow-hidden flex flex-col">
                 <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center">
                     <div className="w-full max-w-4xl pb-32 pt-8">
                         <SeatMap
@@ -124,7 +124,7 @@ export default function SeatSelectionPage({ params }: { params: Promise<{ id: st
                 </div>
 
                 {/* Bottom Action Footer */}
-                <div className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 p-4 sticky bottom-0 z-50 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)]">
+                <div className="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 p-4 sticky bottom-0 z-50 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)]">
                     <div className="max-w-7xl mx-auto flex items-center justify-between">
                         <div className="flex flex-col">
                             {selectedSeats.length > 0 ? (

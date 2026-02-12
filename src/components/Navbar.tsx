@@ -78,7 +78,7 @@ export default function Navbar() {
             <div className="flex flex-col fixed top-0 left-0 right-0 z-50 bg-white dark:bg-black">
                 <nav
                     className={cn(
-                        "transition-all duration-300 ease-in-out border-b border-gray-200 dark:border-gray-800",
+                        "transition-all duration-300 ease-in-out border-b border-gray-200 dark:border-slate-800",
                         isScrolled
                             ? "bg-white/95 dark:bg-black/95 backdrop-blur-md shadow-sm"
                             : "bg-white dark:bg-black"
@@ -102,7 +102,7 @@ export default function Navbar() {
                                 <Input
                                     type="text"
                                     placeholder="Search for Movies, Events, Plays, Sports and Activities"
-                                    className="pl-10 h-10 w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 focus-visible:ring-offset-0 focus-visible:ring-1 focus-visible:ring-indigo-500"
+                                    className="pl-10 h-10 w-full rounded-md border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus-visible:ring-offset-0 focus-visible:ring-1 focus-visible:ring-red-500 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => {
@@ -131,7 +131,7 @@ export default function Navbar() {
                                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            className="absolute left-0 mt-2 top-full w-56 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-lg z-[60] py-2 max-h-80 overflow-y-auto"
+                                            className="absolute left-0 mt-2 top-full w-56 bg-white dark:bg-black border border-gray-100 dark:border-slate-800 rounded-xl shadow-lg z-[60] py-2 max-h-80 overflow-y-auto"
                                         >
                                             <div className="px-4 py-2 border-b border-gray-50 dark:border-gray-800 mb-2">
                                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Popular Cities</p>
@@ -179,7 +179,7 @@ export default function Navbar() {
                                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/50 p-1 overflow-hidden pointer-events-auto"
+                                                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-black border border-gray-100 dark:border-slate-800 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/50 p-1 overflow-hidden pointer-events-auto"
                                                 >
                                                     <div className="px-3 py-2 border-b border-gray-50 dark:border-gray-800">
                                                         <p className="text-xs text-gray-500 dark:text-gray-400">Signed in as</p>

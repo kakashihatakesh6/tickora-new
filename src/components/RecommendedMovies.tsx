@@ -41,11 +41,11 @@ export default function RecommendedMovies() {
     }, []);
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-0 py-12">
-            <div className="flex items-center justify-between mb-6 px-4 sm:px-0">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Recommended Movies</h2>
-                <Link href="/movies" className="flex items-center text-sm font-medium text-red-500 hover:underline">
-                    See All <ChevronRight className="h-4 w-4" />
+        <div className="w-full max-w-7xl mx-auto px-0 py-16">
+            <div className="flex items-center justify-between mb-8 px-4 sm:px-0">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Recommended Movies</h2>
+                <Link href="/movies" className="group flex items-center text-sm font-bold text-red-500 hover:text-red-600 transition-colors">
+                    See All <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
             </div>
 
@@ -78,8 +78,8 @@ export default function RecommendedMovies() {
                         ))
                     )}
                 </CarouselContent>
-                <CarouselPrevious className="left-0 -translate-x-1/2 h-10 w-10 border-none bg-gray-200/80 hover:bg-gray-300 dark:bg-gray-800/80 dark:hover:bg-gray-700 hidden sm:flex" />
-                <CarouselNext className="right-0 translate-x-1/2 h-10 w-10 border-none bg-gray-200/80 hover:bg-gray-300 dark:bg-gray-800/80 dark:hover:bg-gray-700 hidden sm:flex" />
+                <CarouselPrevious className="left-4 -translate-x-0 h-12 w-12 border-none bg-slate-100/90 hover:bg-white dark:bg-slate-800/90 dark:hover:bg-slate-700 shadow-xl backdrop-blur-md hidden sm:flex transition-all hover:scale-110" />
+                <CarouselNext className="right-4 translate-x-0 h-12 w-12 border-none bg-slate-100/90 hover:bg-white dark:bg-slate-800/90 dark:hover:bg-slate-700 shadow-xl backdrop-blur-md hidden sm:flex transition-all hover:scale-110" />
             </Carousel>
         </div>
     );

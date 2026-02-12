@@ -255,8 +255,8 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
         }
     };
 
-    if (loading) return <div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>;
-    if (!sport) return <div className="min-h-screen bg-white flex items-center justify-center">Sport not found</div>;
+    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+    if (!sport) return <div className="min-h-screen bg-background flex items-center justify-center">Sport not found</div>;
 
     // Generate seats within each block
     const renderSeatsInBlock = (block: typeof STADIUM_BLOCKS[0]) => {
@@ -308,19 +308,19 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
     };
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900">
+        <div className="min-h-screen bg-background font-sans text-slate-900 dark:text-slate-100">
             {/* Navbar */}
-            <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
+            <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                        <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-slate-700 dark:text-slate-300">
                             <ChevronLeft className="w-6 h-6" />
                         </Button>
                         <div>
-                            <h1 className="text-sm font-bold text-gray-900 leading-tight">
+                            <h1 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
                                 {sport.team1} vs {sport.team2} - {sport.title}
                             </h1>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
                                 {(() => {
                                     try {
                                         const d = new Date(sport.date_time);
@@ -354,20 +354,20 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                 `}</style>
             </header>
 
-            <main className="pt-[0px] flex h-screen overflow-hidden bg-gray-100 no-scrollbar">
+            <main className="pt-[0px] flex h-screen overflow-hidden bg-background no-scrollbar">
                 {/* Sidebar - Left */}
-                <aside className="w-80 border-r border-gray-200 bg-white px-4 pb-4 mb-4 hidden lg:flex flex-col h-full overflow-hidden">
+                <aside className="w-80 border-r border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 backdrop-blur-md px-4 pb-4 mb-4 hidden lg:flex flex-col h-full overflow-hidden">
                     {/* Top Section - Match Info */}
-                    <div className="py-2 border-b border-gray-100">
+                    <div className="py-2 border-b border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-3 mb-1">
                             {sport.team1_flag && <Image src={sport.team1_flag} alt={sport.team1} width={32} height={32} className="object-contain" />}
-                            <span className="text-xs font-bold text-gray-400 uppercase">vs</span>
+                            <span className="text-xs font-bold text-slate-400 dark:text-slate-600 uppercase">vs</span>
                             {sport.team2_flag && <Image src={sport.team2_flag} alt={sport.team2} width={32} height={32} className="object-contain" />}
                         </div>
-                        <h2 className="text-base font-bold leading-tight">
+                        <h2 className="text-base font-bold leading-tight text-slate-900 dark:text-slate-100">
                             {sport.team1} vs {sport.team2}
                         </h2>
-                        <p className="text-xs text-gray-500 mt-0.5">{sport.title}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{sport.title}</p>
                     </div>
 
                     {/* Middle Section - Scrollable Content */}
@@ -377,8 +377,8 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                         </div>
 
                         {/* Ticket Count Selector */}
-                        <div className="p-2 bg-purple-50 rounded-lg border border-purple-100">
-                            <div className="flex items-center gap-2 mb-1.5 text-purple-900 font-bold text-xs">
+                        <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/50">
+                            <div className="flex items-center gap-2 mb-1.5 text-purple-900 dark:text-purple-300 font-bold text-xs">
                                 <Users className="w-3 h-3" />
                                 <span>Select Tickets</span>
                             </div>
@@ -394,7 +394,7 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                             "w-7 h-7 rounded-lg text-[10px] font-bold transition-all",
                                             ticketCount === num
                                                 ? "bg-purple-600 text-white shadow-md shadow-purple-200"
-                                                : "bg-white text-gray-600 border border-gray-200 hover:border-purple-300"
+                                                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-purple-300"
                                         )}
                                     >
                                         {num}
@@ -405,9 +405,9 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
 
                         {/* Price Legend */}
                         <div className="space-y-0.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1 px-1">Price Legend</p>
+                            <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 px-1">Price Legend</p>
                             {SEAT_CATEGORIES.map((cat) => (
-                                <div key={cat.id} className="flex items-center justify-between p-1.5 hover:bg-gray-50 cursor-pointer rounded-lg border border-transparent transition-all group">
+                                <div key={cat.id} className="flex items-center justify-between p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer rounded-lg border border-transparent transition-all group">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-2.5 h-2.5 rounded-sm ${cat.color} opacity-80 group-hover:opacity-100 transition-opacity shadow-sm`}></div>
                                         <span className={`text-xs font-bold ${cat.color.replace('bg-', 'text-')}`}>{cat.label}</span>
@@ -418,15 +418,15 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                     </div>
 
                     {/* Bottom Section - Fixed Booking */}
-                    <div className="mt-auto border-t border-gray-100 mb-28 pt-1.5 bg-white">
+                    <div className="mt-auto border-t border-slate-100 dark:border-slate-800 mb-28 pt-1.5 bg-white dark:bg-slate-900">
                         <div className="mb-1.5">
                             <div className="flex items-center justify-between mb-1.5">
-                                <p className="text-xs font-bold text-gray-800">Selected Seats</p>
-                                <span className="text-[10px] font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+                                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Selected Seats</p>
+                                <span className="text-[10px] font-medium text-purple-600 bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded-full">
                                     {selectedSeats.length}/{ticketCount}
                                 </span>
                             </div>
-                            <div className="p-2 border rounded-lg bg-gray-50/50 shadow-sm border-gray-100">
+                            <div className="p-3 border rounded-xl bg-slate-50/50 dark:bg-slate-800/30 shadow-sm border-slate-100 dark:border-slate-800">
                                 {selectedSeats.length > 0 ? (
                                     <>
                                         <div className="flex flex-wrap gap-1 mb-1.5 max-h-12 overflow-y-auto no-scrollbar">
@@ -436,9 +436,9 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                                 </span>
                                             ))}
                                         </div>
-                                        <div className="flex items-center justify-between pt-1.5 border-t border-gray-200 gap-2">
+                                        <div className="flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-700 gap-2">
                                             <div className="flex flex-col min-w-0">
-                                                <span className="text-base font-black text-gray-900 leading-none truncate">
+                                                <span className="text-base font-black text-slate-900 dark:text-slate-100 leading-none truncate">
                                                     ₹{(() => {
                                                         const firstSeat = selectedSeats[0];
                                                         const block = STADIUM_BLOCKS.find(b =>
@@ -447,7 +447,7 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                                         return (block?.price || 0) * selectedSeats.length;
                                                     })().toLocaleString()}
                                                 </span>
-                                                <span className="text-[8px] text-gray-500 mt-0 uppercase font-bold tracking-tighter">Total Payable</span>
+                                                <span className="text-[8px] text-slate-500 dark:text-slate-400 mt-0 uppercase font-bold tracking-tighter">Total Payable</span>
                                             </div>
                                             <Button
                                                 size="sm"
@@ -510,10 +510,11 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                         <path
                                             key={`path-${block.id}`}
                                             d={path}
-                                            fill="#e5e7eb"
+                                            fill="currentColor"
+                                            className="text-slate-200 dark:text-slate-800 hover:text-slate-300 dark:hover:text-slate-700 transition-all duration-300 ease-out"
                                             stroke="white"
+                                            strokeOpacity={0.1}
                                             strokeWidth="1"
-                                            className="transition-all duration-300 ease-out"
                                         />
                                     );
                                 })}
@@ -570,10 +571,10 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                                             y={labelPos.y}
                                             textAnchor="middle"
                                             dominantBaseline="middle"
-                                            fill="#4b5563"
+                                            fill="currentColor"
                                             fontSize="14"
                                             fontWeight="800"
-                                            className="pointer-events-none select-none uppercase tracking-widest"
+                                            className="pointer-events-none select-none uppercase tracking-widest text-slate-400 dark:text-slate-600"
                                             style={{
                                                 transformOrigin: `${labelPos.x}px ${labelPos.y}px`,
                                                 transform: `rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}deg)`,
@@ -594,20 +595,20 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                         <Button
                             variant="outline"
                             size="icon"
-                            className="bg-white rounded-full shadow-lg h-9 w-9 hover:bg-gray-50 border-gray-200"
+                            className="bg-white dark:bg-slate-800 rounded-full shadow-lg h-10 w-10 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 transition-all active:scale-95"
                             onClick={handleZoomIn}
                             disabled={zoom >= 6}
                         >
-                            <ZoomIn className="w-4 h-4 text-gray-700" />
+                            <ZoomIn className="w-5 h-5 text-slate-700 dark:text-slate-300" />
                         </Button>
                         <Button
                             variant="outline"
                             size="icon"
-                            className="bg-white rounded-full shadow-lg h-9 w-9 hover:bg-gray-50 border-gray-200"
+                            className="bg-white dark:bg-slate-800 rounded-full shadow-lg h-10 w-10 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 transition-all active:scale-95"
                             onClick={handleZoomOut}
                             disabled={zoom <= 0.5}
                         >
-                            <ZoomOut className="w-4 h-4 text-gray-700" />
+                            <ZoomOut className="w-5 h-5 text-slate-700 dark:text-slate-300" />
                         </Button>
                     </div>
                 </section>

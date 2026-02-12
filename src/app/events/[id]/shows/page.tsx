@@ -53,8 +53,8 @@ export default function ShowsPage({ params }: { params: Promise<{ id: string }> 
         return d;
     });
 
-    if (loading) return <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">Loading...</div>;
-    if (!event) return <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">Event not found</div>;
+    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+    if (!event) return <div className="min-h-screen bg-background flex items-center justify-center">Event not found</div>;
 
     // Mock showtimes
     const showtimes = [
@@ -66,9 +66,9 @@ export default function ShowsPage({ params }: { params: Promise<{ id: string }> 
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black">
+        <div className="min-h-screen bg-background">
             {/* Header */}
-            <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-4">
@@ -94,7 +94,7 @@ export default function ShowsPage({ params }: { params: Promise<{ id: string }> 
                 </div>
 
                 {/* Date Slider */}
-                <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-x-auto no-scrollbar">
+                <div className="border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto no-scrollbar">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex gap-4 py-2 min-w-max">
                             {dates.map((date, idx) => {
@@ -122,7 +122,7 @@ export default function ShowsPage({ params }: { params: Promise<{ id: string }> 
             </div>
 
             {/* Filters Bar */}
-            <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 overflow-x-auto no-scrollbar">
                     <button className="flex items-center hover:text-red-500 whitespace-nowrap">
                         Price Range <Filter className="w-3 h-3 ml-1" />
@@ -142,7 +142,7 @@ export default function ShowsPage({ params }: { params: Promise<{ id: string }> 
             {/* Venue List */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
                 {/* Mock Venue Item */}
-                <div className="bg-white dark:bg-gray-900 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 group">
+                <div className="bg-white dark:bg-slate-900 p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 group">
                     <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-8">
                         <div className="flex-1">
                             <div className="flex items-start justify-between">

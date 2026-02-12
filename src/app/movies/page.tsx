@@ -31,7 +31,7 @@ function FilterSection({ title, children, defaultOpen = false }: { title: string
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
-        <div className="border-b border-gray-100 dark:border-gray-800 py-4">
+        <div className="border-b border-gray-100 dark:border-slate-800/60 py-4">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center justify-between w-full text-left mb-2 group"
@@ -57,9 +57,9 @@ function MovieCard({ movie }: { movie: Movie }) {
 
     return (
         <Link href={`/movies/${movie.id}`} className="group block h-full">
-            <div className="flex flex-col h-full rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-900">
+            <div className="flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/10 bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800/50">
                 {/* Image Container */}
-                <div className="relative aspect-[2/3] w-full overflow-hidden bg-gray-100">
+                <div className="relative aspect-[2/3] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <Image
                         src={movie.image_url}
                         alt={movie.title}
@@ -138,12 +138,12 @@ function MoviesPageContent() {
     return (
         <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Sidebar Filters */}
-            <aside className="w-full lg:w-64 flex-shrink-0 bg-white dark:bg-black lg:sticky lg:top-24 hidden lg:block">
+            <aside className="w-full lg:w-64 flex-shrink-0 bg-white dark:bg-black lg:sticky lg:top-24 hidden lg:block rounded-2xl border border-gray-100 dark:border-slate-800 p-4 shadow-sm">
                 <div className="mb-4">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">Filters</h2>
                 </div>
 
-                <div className="bg-white dark:bg-black rounded-lg">
+                <div className="bg-white dark:bg-black">
                     <FilterSection title="Date" defaultOpen={true}>
                         <div className="space-y-3 px-1">
                             {['Today', 'Tomorrow', 'This Weekend'].map((label) => (
@@ -201,7 +201,7 @@ function MoviesPageContent() {
                         <Badge
                             key={cat}
                             variant="outline"
-                            className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900"
+                            className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900 dark:text-gray-300"
                         >
                             {cat}
                         </Badge>
@@ -220,8 +220,9 @@ function MoviesPageContent() {
                             <MovieCard key={movie.id} movie={movie} />
                         ))}
                         {movies.length === 0 && (
-                            <div className="col-span-full py-20 text-center text-gray-500">
-                                No movies found in {selectedCity}.
+                            <div className="col-span-full py-20 text-center bg-white dark:bg-slate-900/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                                <p className="text-slate-900 dark:text-slate-100 font-medium mb-1">No movies found in {selectedCity}.</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Try changing your location or category filters.</p>
                             </div>
                         )}
                     </div>
@@ -240,7 +241,7 @@ function MoviesPageContent() {
 
 export default function MoviesPage() {
     return (
-        <main className="min-h-screen bg-gray-50 dark:bg-black/50 pt-8 pb-16 px-4 sm:px-6 lg:px-8">
+        <main className="min-h-screen bg-background pt-8 pb-16 px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
                 <Suspense fallback={<div>Loading...</div>}>
                     <MoviesPageContent />

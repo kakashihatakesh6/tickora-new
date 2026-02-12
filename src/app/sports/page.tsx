@@ -33,7 +33,7 @@ function FilterSection({ title, children, defaultOpen = false }: { title: string
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
-        <div className="border-b border-gray-100 dark:border-gray-800 py-4">
+        <div className="border-b border-gray-100 dark:border-slate-800/60 py-4">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center justify-between w-full text-left mb-2 group"
@@ -67,19 +67,19 @@ function SportCard({ sport }: { sport: Sport }) {
 
     return (
         <Link href={`/sports/${sport.id}`} className="group block h-full">
-            <div className="flex flex-col h-full rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-900">
+            <div className="flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/10 bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800/50">
                 {/* Image Container */}
-                <div className="relative aspect-[2/3] w-full overflow-hidden bg-gray-100">
+                <div className="relative aspect-[2/3] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <Image
                         src={sport.image_url}
                         alt={sport.title}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
 
                     {/* Overlay Date */}
                     <div className="absolute bottom-0 left-0 w-full bg-black/60 backdrop-blur-sm text-white px-3 py-2 text-xs font-medium">
-                        {dateFormatted} onwards
+                        {dateFormatted}
                     </div>
 
                     {/* Promoted Tag (Random for demo) */}
@@ -96,11 +96,11 @@ function SportCard({ sport }: { sport: Sport }) {
                         {sport.title}
                     </h3>
 
-                    <div className="flex items-start text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-start text-xs text-slate-500 dark:text-slate-400">
                         <span className="line-clamp-1">{sport.venue}: {sport.city}</span>
                     </div>
 
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
                         {sport.category}
                     </div>
 
@@ -147,12 +147,12 @@ function SportsPageContent() {
     return (
         <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Sidebar Filters */}
-            <aside className="w-full lg:w-64 flex-shrink-0 bg-white dark:bg-black lg:sticky lg:top-24 hidden lg:block">
+            <aside className="w-full lg:w-64 flex-shrink-0 bg-white dark:bg-black lg:sticky lg:top-24 hidden lg:block rounded-2xl border border-gray-100 dark:border-slate-800 p-4 shadow-sm">
                 <div className="mb-4">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">Filters</h2>
                 </div>
 
-                <div className="bg-white dark:bg-black rounded-lg">
+                <div className="bg-white dark:bg-black">
                     <FilterSection title="Date" defaultOpen={true}>
                         <div className="space-y-3 px-1">
                             {['Today', 'Tomorrow', 'This Weekend'].map((label) => (
@@ -210,7 +210,7 @@ function SportsPageContent() {
                         <Badge
                             key={cat}
                             variant="outline"
-                            className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900"
+                            className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900 dark:text-gray-300"
                         >
                             {cat}
                         </Badge>
@@ -229,8 +229,9 @@ function SportsPageContent() {
                             <SportCard key={sport.id} sport={sport} />
                         ))}
                         {sports.length === 0 && (
-                            <div className="col-span-full py-20 text-center text-gray-500">
-                                No sports found in {selectedCity}.
+                            <div className="col-span-full py-20 text-center bg-white dark:bg-slate-900/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                                <p className="text-slate-900 dark:text-slate-100 font-medium mb-1">No sports found in {selectedCity}.</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Try changing your location or category filters.</p>
                             </div>
                         )}
                     </div>
@@ -248,7 +249,7 @@ function SportsPageContent() {
 
 export default function SportsPage() {
     return (
-        <main className="min-h-screen bg-gray-50 dark:bg-black/50 pt-8 pb-16 px-4 sm:px-6 lg:px-8">
+        <main className="min-h-screen bg-background pt-8 pb-16 px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
                 <Suspense fallback={<div>Loading...</div>}>
                     <SportsPageContent />

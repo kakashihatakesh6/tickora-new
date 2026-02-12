@@ -33,7 +33,7 @@ function FilterSection({ title, children, defaultOpen = false }: { title: string
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
-        <div className="border-b border-gray-100 dark:border-gray-800 py-4">
+        <div className="border-b border-gray-100 dark:border-slate-800/60 py-4">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center justify-between w-full text-left mb-2 group"
@@ -67,14 +67,14 @@ function EventCard({ event }: { event: Event }) {
 
     return (
         <Link href={`/events/${event.id}`} className="group block h-full">
-            <div className="flex flex-col h-full rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-900">
+            <div className="flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/10 bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800/50">
                 {/* Image Container */}
-                <div className="relative aspect-[2/3] w-full overflow-hidden bg-gray-100">
+                <div className="relative aspect-[2/3] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <Image
                         src={event.image_url}
                         alt={event.title}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
 
                     {/* Overlay Date */}
@@ -84,7 +84,7 @@ function EventCard({ event }: { event: Event }) {
 
                     {/* Event Type Tag */}
                     {event.event_type && (
-                        <div className="absolute top-2 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase">
+                        <div className="absolute top-3 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-l-sm shadow-lg">
                             {event.event_type}
                         </div>
                     )}
@@ -96,11 +96,11 @@ function EventCard({ event }: { event: Event }) {
                         {event.title}
                     </h3>
 
-                    <div className="flex items-start text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-start text-xs text-slate-500 dark:text-slate-400">
                         <span className="line-clamp-1">{event.venue}: {event.city}</span>
                     </div>
 
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
                         {event.category || event.event_type}
                     </div>
 
@@ -144,12 +144,12 @@ function EventsPageContent() {
     return (
         <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Sidebar Filters */}
-            <aside className="w-full lg:w-64 flex-shrink-0 bg-white dark:bg-black lg:sticky lg:top-24 hidden lg:block">
+            <aside className="w-full lg:w-64 flex-shrink-0 bg-white dark:bg-black lg:sticky lg:top-24 hidden lg:block rounded-2xl border border-gray-100 dark:border-slate-800 p-4 shadow-sm">
                 <div className="mb-4">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">Filters</h2>
                 </div>
 
-                <div className="bg-white dark:bg-black rounded-lg">
+                <div className="bg-white dark:bg-black">
                     <FilterSection title="Date" defaultOpen={true}>
                         <div className="space-y-3 px-1">
                             {['Today', 'Tomorrow', 'This Weekend'].map((label) => (
@@ -213,8 +213,9 @@ function EventsPageContent() {
                             <EventCard key={event.id} event={event} />
                         ))}
                         {events.length === 0 && (
-                            <div className="col-span-full py-20 text-center text-gray-500">
-                                No events found in {selectedCity}.
+                            <div className="col-span-full py-20 text-center bg-white dark:bg-slate-900/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                                <p className="text-slate-900 dark:text-slate-100 font-medium mb-1">No events found in {selectedCity}.</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Try changing your location or category filters.</p>
                             </div>
                         )}
                     </div>
@@ -233,7 +234,7 @@ function EventsPageContent() {
 
 export default function EventsPage() {
     return (
-        <main className="min-h-screen bg-gray-50 dark:bg-black/50 pt-8 pb-16 px-4 sm:px-6 lg:px-8">
+        <main className="min-h-screen bg-background pt-8 pb-16 px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
                 <Suspense fallback={<div>Loading...</div>}>
                     <EventsPageContent />

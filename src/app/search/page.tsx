@@ -40,15 +40,15 @@ function ResultCard({ item }: { item: SearchResult }) {
 
     return (
         <Link href={href} className="group block h-full">
-            <div className="flex flex-col h-full rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
-                <div className="relative aspect-[2/3] w-full overflow-hidden bg-gray-100">
+            <div className="flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/10 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800">
+                <div className="relative aspect-[2/3] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <Image
                         src={item.image_url}
                         alt={item.title}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute top-2 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase">
+                    <div className="absolute top-3 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-l-sm shadow-lg">
                         {item.event_type}
                     </div>
                 </div>
@@ -123,9 +123,9 @@ function SearchResults() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
-                    <p className="text-gray-500 mb-2">No results found for "{query}"</p>
-                    <p className="text-sm text-gray-400">Try searching for something else like "Inception", "Coldplay", or "Cricket"</p>
+                <div className="text-center py-20 bg-white dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                    <p className="text-slate-900 dark:text-slate-100 font-medium mb-2">No results found for "{query}"</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">Try searching for something else like "Inception", "Coldplay", or "Cricket"</p>
                 </div>
             )}
         </div>
@@ -134,7 +134,7 @@ function SearchResults() {
 
 export default function SearchPage() {
     return (
-        <main className="min-h-screen bg-gray-50 dark:bg-black/50 pt-8 pb-16">
+        <main className="min-h-screen bg-background pt-8 pb-16">
             <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="animate-spin text-red-500" /></div>}>
                 <SearchResults />
             </Suspense>

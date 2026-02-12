@@ -100,11 +100,11 @@ export default function MovieDetailsPage({ params }: { params: Promise<{ id: str
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-black pb-20 pt-20 flex justify-center">
+            <div className="min-h-screen bg-background pb-20 pt-20 flex justify-center">
                 <div className="animate-pulse flex flex-col items-center">
-                    <div className="h-64 w-48 bg-gray-200 dark:bg-gray-800 rounded-lg mb-4"></div>
-                    <div className="h-8 w-64 bg-gray-200 dark:bg-gray-800 rounded mb-2"></div>
-                    <div className="h-4 w-48 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                    <div className="h-96 w-64 bg-slate-200 dark:bg-slate-800 rounded-2xl mb-6 shadow-2xl"></div>
+                    <div className="h-10 w-80 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
+                    <div className="h-5 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
                 </div>
             </div>
         );
@@ -120,7 +120,7 @@ export default function MovieDetailsPage({ params }: { params: Promise<{ id: str
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black pb-20">
+        <div className="min-h-screen bg-background pb-20">
             {/* Immersive Hero Section */}
             <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden">
                 <Image
@@ -130,8 +130,8 @@ export default function MovieDetailsPage({ params }: { params: Promise<{ id: str
                     className="object-cover blur-2xl opacity-60 dark:opacity-40 scale-110"
                     priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-gray-50/60 to-transparent dark:from-black dark:via-black/60 dark:to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
 
                 <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">
                     <div className="pt-6 pb-8">
@@ -238,7 +238,7 @@ export default function MovieDetailsPage({ params }: { params: Promise<{ id: str
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                                     {movie.cast.map((actor, idx) => (
                                         <div key={idx} className="text-center group cursor-pointer">
-                                            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md group-hover:shadow-xl transition-all ring-2 ring-transparent group-hover:ring-red-500 group-hover:ring-4">
+                                            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md group-hover:shadow-2xl transition-all ring-2 ring-transparent group-hover:ring-red-500/50 group-hover:ring-[6px]">
                                                 <Image
                                                     src={actor.image}
                                                     alt={actor.name}
@@ -288,7 +288,7 @@ export default function MovieDetailsPage({ params }: { params: Promise<{ id: str
                             </h2>
                             <div className="space-y-4">
                                 {mockReviews.map((review) => (
-                                    <Card key={review.id} className="border-gray-200 dark:border-gray-800 hover:shadow-lg transition-all hover:scale-[1.01] bg-white dark:bg-gray-900">
+                                    <Card key={review.id} className="border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-red-500/5 transition-all hover:scale-[1.01] bg-white dark:bg-slate-900/50 backdrop-blur-sm">
                                         <CardContent className="p-6">
                                             <div className="flex items-start justify-between mb-3">
                                                 <div className="flex items-center gap-3">
@@ -317,7 +317,7 @@ export default function MovieDetailsPage({ params }: { params: Promise<{ id: str
 
                     {/* Sidebar */}
                     <div className="lg:col-span-1 space-y-8">
-                        <Card className="border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-4">
+                        <Card className="border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-24 shadow-xl">
                             <CardContent className="p-6">
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Movie Info</h3>
                                 <div className="space-y-3 text-sm">

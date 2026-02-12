@@ -30,33 +30,33 @@ export default function MovieCard({ id, title, image, genre, rating, votes, isPr
     }
 
     return (
-        <Link href={`${basePath}/${id}`} className="block group w-[220px] shrink-0">
-            <div className="relative rounded-lg overflow-hidden mb-3">
+        <Link href={`${basePath}/${id}`} className="block group w-[210px] sm:w-[220px] shrink-0">
+            <div className="relative rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-2xl group-hover:shadow-red-500/10 transition-all duration-300">
                 <img
                     src={image}
                     alt={title}
-                    className="w-full h-[360px] object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-[320px] sm:h-[360px] object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 {isPromoted && (
-                    <div className="absolute top-2 right-0 bg-red-600 text-white text-[10px] items-center font-bold px-2 py-0.5 rounded-l-sm z-10 uppercase tracking-wider">
+                    <div className="absolute top-3 right-0 bg-red-600 text-white text-[10px] items-center font-bold px-2 py-0.5 rounded-l-sm z-10 uppercase tracking-widest shadow-lg">
                         Promoted
                     </div>
                 )}
                 {rating && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-[2px] p-2 flex items-center justify-between text-white">
-                        <div className="flex items-center gap-1">
+                    <div className="absolute bottom-0 left-0 right-0 bg-slate-900/80 backdrop-blur-md p-3 flex items-center justify-between text-white border-t border-white/5">
+                        <div className="flex items-center gap-1.5">
                             <Star className="h-4 w-4 fill-red-500 text-red-500" />
-                            <span className="text-sm font-medium">{rating}/10</span>
+                            <span className="text-sm font-bold">{rating}/10</span>
                         </div>
-                        <span className="text-xs text-gray-300">{votes ? votes : 'N/A'}</span>
+                        <span className="text-[10px] text-slate-300 uppercase font-medium tracking-tight">{votes ? votes : 'N/A'} votes</span>
                     </div>
                 )}
             </div>
 
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-red-500 transition-colors">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 truncate group-hover:text-red-500 transition-colors leading-tight mb-1">
                 {title}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate font-medium">
                 {genre}
             </p>
         </Link>

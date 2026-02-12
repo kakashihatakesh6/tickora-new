@@ -8,7 +8,7 @@ import SubNavbar from '@/components/SubNavbar';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
+    <main className="min-h-screen bg-background pb-20">
       {/* Hero Section */}
       <HeroCarousel />
 
