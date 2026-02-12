@@ -71,10 +71,14 @@ function ResultCard({ item }: { item: SearchResult }) {
 function SearchResults() {
     const searchParams = useSearchParams();
     const query = searchParams.get('q');
-    const [results, setResults] = useState<SearchResult[]>([]);
+    const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedCity, setSelectedCity] = useState('Mumbai');
 
     useEffect(() => {
+        const city = localStorage.getItem('selectedLocation') || 'Mumbai';
+        setSelectedCity(city);
+
         const fetchResults = async () => {
             if (!query) {
                 setResults([]);
@@ -83,7 +87,10 @@ function SearchResults() {
             }
             setLoading(true);
             try {
-                const res = await api.get('/search', { q: query });
+                const res = await api.get('/search', {
+                    q: query,
+                    city: city
+                });
                 setResults(res.data || []);
             } catch (error) {
                 console.error('Failed to fetch search results', error);

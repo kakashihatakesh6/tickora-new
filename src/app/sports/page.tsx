@@ -118,12 +118,22 @@ function SportsPageContent() {
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
     const query = searchParams.get('q');
+    const [selectedCity, setSelectedCity] = useState('Mumbai'); // Initialize with a default
 
     useEffect(() => {
+        // Read from localStorage only once on mount
+        const cityFromStorage = localStorage.getItem('selectedLocation');
+        if (cityFromStorage) {
+            setSelectedCity(cityFromStorage);
+        }
+
         const fetchSports = async () => {
             setLoading(true);
             try {
-                const res = await api.get('/sports', { q: query || undefined });
+                const res = await api.get('/sports', {
+                    q: query || undefined,
+                    city: cityFromStorage || 'Mumbai' // Use city from storage or default
+                });
                 setSports(res.data || []);
             } catch (error) {
                 console.error('Failed to fetch sports', error);
@@ -132,7 +142,7 @@ function SportsPageContent() {
             }
         };
         fetchSports();
-    }, [query]);
+    }, [query]); // Depend only on query, selectedCity is updated once from localStorage
 
     return (
         <div className="flex flex-col lg:flex-row gap-8 items-start">
@@ -188,23 +198,23 @@ function SportsPageContent() {
 
             {/* Main Content */}
             <div className="flex-1 w-full">
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                        {query ? `Search results for "${query}"` : 'Sports In Mumbai'}
+                <div className="flex items-center justify-between mb-6">
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                        {query ? `Search results for "${query}"` : `Sports In ${selectedCity}`}
                     </h1>
+                </div>
 
-                    {/* Category Chips */}
-                    <div className="flex flex-wrap gap-3 mb-6">
-                        {CATEGORIES.map((cat) => (
-                            <Badge
-                                key={cat}
-                                variant="outline"
-                                className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900"
-                            >
-                                {cat}
-                            </Badge>
-                        ))}
-                    </div>
+                {/* Category Chips */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                    {CATEGORIES.map((cat) => (
+                        <Badge
+                            key={cat}
+                            variant="outline"
+                            className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900"
+                        >
+                            {cat}
+                        </Badge>
+                    ))}
                 </div>
 
                 {loading ? (
@@ -220,7 +230,7 @@ function SportsPageContent() {
                         ))}
                         {sports.length === 0 && (
                             <div className="col-span-full py-20 text-center text-gray-500">
-                                No sports events found.
+                                No sports found in {selectedCity}.
                             </div>
                         )}
                     </div>

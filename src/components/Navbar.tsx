@@ -20,6 +20,13 @@ export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedLocation, setSelectedLocation] = useState('Mumbai');
+    const [locationMenuOpen, setLocationMenuOpen] = useState(false);
+
+    const cities = [
+        'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Ahmedabad',
+        'Chennai', 'Kolkata', 'Pune', 'Jaipur', 'Lucknow', 'Chandigarh'
+    ];
 
     useEffect(() => {
         setMounted(true);
@@ -29,6 +36,11 @@ export default function Navbar() {
             setUser(JSON.parse(userData));
         }
 
+        const savedLocation = localStorage.getItem('selectedLocation');
+        if (savedLocation) {
+            setSelectedLocation(savedLocation);
+        }
+
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };
@@ -36,6 +48,14 @@ export default function Navbar() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const handleLocationSelect = (city: string) => {
+        setSelectedLocation(city);
+        localStorage.setItem('selectedLocation', city);
+        setLocationMenuOpen(false);
+        // Refresh the page or trigger a data fetch update
+        window.location.reload();
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -96,9 +116,41 @@ export default function Navbar() {
 
                         {/* Right Side Actions */}
                         <div className="flex items-center gap-4 shrink-0">
-                            {/* Location - Mock */}
-                            <div className="hidden md:flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:text-indigo-600">
-                                Mumbai <ChevronDown size={14} />
+                            {/* Location Selector */}
+                            <div className="hidden md:flex items-center relative gap-1 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:text-red-500 transition-colors">
+                                <div
+                                    className="flex items-center gap-1"
+                                    onClick={() => setLocationMenuOpen(!locationMenuOpen)}
+                                >
+                                    {selectedLocation} <ChevronDown size={14} className={cn("transition-transform", locationMenuOpen && "rotate-180")} />
+                                </div>
+
+                                <AnimatePresence>
+                                    {locationMenuOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            className="absolute left-0 mt-2 top-full w-56 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-lg z-[60] py-2 max-h-80 overflow-y-auto"
+                                        >
+                                            <div className="px-4 py-2 border-b border-gray-50 dark:border-gray-800 mb-2">
+                                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Popular Cities</p>
+                                            </div>
+                                            {cities.map((city) => (
+                                                <button
+                                                    key={city}
+                                                    onClick={() => handleLocationSelect(city)}
+                                                    className={cn(
+                                                        "w-full text-left px-4 py-2 text-sm transition-colors hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600",
+                                                        selectedLocation === city ? "text-red-600 font-bold bg-red-50/50 dark:bg-red-900/5" : "text-gray-700 dark:text-gray-300"
+                                                    )}
+                                                >
+                                                    {city}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
 
                             <ThemeToggle />

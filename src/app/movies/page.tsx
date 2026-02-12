@@ -112,12 +112,19 @@ function MoviesPageContent() {
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
     const query = searchParams.get('q');
+    const [selectedCity, setSelectedCity] = useState('Mumbai');
 
     useEffect(() => {
+        const city = localStorage.getItem('selectedLocation') || 'Mumbai';
+        setSelectedCity(city);
+
         const fetchMovies = async () => {
             setLoading(true);
             try {
-                const res = await api.get('/movies', { q: query || undefined });
+                const res = await api.get('/movies', {
+                    q: query || undefined,
+                    city: city
+                });
                 setMovies(res.data || []);
             } catch (error) {
                 console.error('Failed to fetch movies', error);
@@ -182,23 +189,23 @@ function MoviesPageContent() {
 
             {/* Main Content */}
             <div className="flex-1 w-full">
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                        {query ? `Search results for "${query}"` : 'Movies In Mumbai'}
+                <div className="flex items-center justify-between mb-6">
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                        {query ? `Search results for "${query}"` : `Movies In ${selectedCity}`}
                     </h1>
+                </div>
 
-                    {/* Category Chips */}
-                    <div className="flex flex-wrap gap-3 mb-6">
-                        {CATEGORIES.map((cat) => (
-                            <Badge
-                                key={cat}
-                                variant="outline"
-                                className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900"
-                            >
-                                {cat}
-                            </Badge>
-                        ))}
-                    </div>
+                {/* Category Chips */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                    {CATEGORIES.map((cat) => (
+                        <Badge
+                            key={cat}
+                            variant="outline"
+                            className="rounded-full px-4 py-1.5 text-xs font-normal cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors bg-white dark:bg-gray-900"
+                        >
+                            {cat}
+                        </Badge>
+                    ))}
                 </div>
 
                 {loading ? (
@@ -214,12 +221,13 @@ function MoviesPageContent() {
                         ))}
                         {movies.length === 0 && (
                             <div className="col-span-full py-20 text-center text-gray-500">
-                                No movies found.
+                                No movies found in {selectedCity}.
                             </div>
                         )}
                     </div>
                 )}
             </div>
+
             {/* Mobile Filter Button (visible only on small screens) */}
             <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
                 <Button className="rounded-full shadow-xl px-6 bg-red-600 hover:bg-red-700 text-white">
