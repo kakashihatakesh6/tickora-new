@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
 import api from '@/lib/api';
@@ -11,6 +11,9 @@ import { Input } from '@/components/ui/input';
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const returnUrl = searchParams.get('returnUrl');
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -30,7 +33,8 @@ export default function LoginPage() {
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
 
-            router.push('/');
+            // Redirect to return URL if present, otherwise go to home
+            router.push(returnUrl || '/');
         } catch (err: any) {
             setError(err.response?.data?.error || 'Invalid credentials. Please try again.');
         } finally {

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -115,12 +116,14 @@ function SportCard({ sport }: { sport: Sport }) {
 function SportsPageContent() {
     const [sports, setSports] = useState<Sport[]>([]);
     const [loading, setLoading] = useState(true);
+    const searchParams = useSearchParams();
+    const query = searchParams.get('q');
 
     useEffect(() => {
         const fetchSports = async () => {
             setLoading(true);
             try {
-                const res = await api.get('/sports');
+                const res = await api.get('/sports', { q: query || undefined });
                 setSports(res.data || []);
             } catch (error) {
                 console.error('Failed to fetch sports', error);
@@ -129,7 +132,7 @@ function SportsPageContent() {
             }
         };
         fetchSports();
-    }, []);
+    }, [query]);
 
     return (
         <div className="flex flex-col lg:flex-row gap-8 items-start">
@@ -186,7 +189,9 @@ function SportsPageContent() {
             {/* Main Content */}
             <div className="flex-1 w-full">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Sports In Mumbai</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                        {query ? `Search results for "${query}"` : 'Sports In Mumbai'}
+                    </h1>
 
                     {/* Category Chips */}
                     <div className="flex flex-wrap gap-3 mb-6">

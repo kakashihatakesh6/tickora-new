@@ -41,6 +41,15 @@ export default function MovieSeatSelectionPage({ params }: { params: Promise<{ i
     const [selectedSeats, setSelectedSeats] = useState<{ id: string; price: number; tier: string }[]>([]);
 
     useEffect(() => {
+        // Check authentication first
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        if (!token) {
+            // Redirect to login with return URL
+            const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            router.push(`/login?returnUrl=${returnUrl}`);
+            return;
+        }
+
         const fetchData = async () => {
             try {
                 // Fetch movie details
@@ -59,20 +68,44 @@ export default function MovieSeatSelectionPage({ params }: { params: Promise<{ i
             }
         };
         fetchData();
-    }, [movieId, showId]);
+    }, [movieId, showId, router]);
 
-    const handleSeatSelect = (seatId: string, price: number, tier: string) => {
-        setSelectedSeats(prev => {
-            const exists = prev.find(s => s.id === seatId);
-            if (exists) {
-                return prev.filter(s => s.id !== seatId);
+    const handleSeatSelect = async (seatId: string, price: number, tier: string) => {
+        const isSelected = selectedSeats.some(s => s.id === seatId);
+
+        if (isSelected) {
+            // Deselect: Unlock seat
+            try {
+                await api.post('/bookings/unlock', {
+                    eventId: showId,
+                    seatId: seatId
+                });
+                setSelectedSeats(prev => prev.filter(s => s.id !== seatId));
+            } catch (error) {
+                console.error("Failed to unlock seat", error);
+                // Even if unlock fails, deselect locally to allow user to proceed/cancel
+                setSelectedSeats(prev => prev.filter(s => s.id !== seatId));
             }
-            if (prev.length >= 10) {
+        } else {
+            // Select: Lock seat
+            if (selectedSeats.length >= 10) {
                 alert("You can only select up to 10 seats.");
-                return prev;
+                return;
             }
-            return [...prev, { id: seatId, price, tier }];
-        });
+
+            try {
+                const res = await api.post('/bookings/lock', {
+                    eventId: showId,
+                    seatId: seatId
+                });
+                if (res.status === 200) {
+                    setSelectedSeats(prev => [...prev, { id: seatId, price, tier }]);
+                }
+            } catch (error: any) {
+                console.error("Failed to lock seat", error);
+                alert(error.response?.data?.error || "Failed to lock seat. It might be already taken.");
+            }
+        }
     };
 
     const handleProceed = () => {

@@ -10,7 +10,7 @@ interface ApiResponse<T = any> {
 const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<T>> => {
     let data: any;
     const contentType = response.headers.get('content-type');
-    
+
     if (contentType && contentType.includes('application/json')) {
         data = await response.json();
     } else {
@@ -35,14 +35,14 @@ const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<
 
         const error = new Error(data?.error || data?.message || 'API Error') as any;
         error.response = result;
-        
+
         console.error('API Error:', {
             url: response.url,
             status: response.status,
             data: data,
             message: error.message
         });
-        
+
         throw error;
     }
 
@@ -52,10 +52,10 @@ const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<
 const api = {
     request: async <T = any>(method: string, endpoint: string, body?: any): Promise<ApiResponse<T>> => {
         const url = `${BASE_URL}${endpoint}`;
-        
+
         // Get token
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-        
+
         const headers: HeadersInit = {
             'Content-Type': 'application/json',
         };
@@ -82,7 +82,20 @@ const api = {
         }
     },
 
-    get: <T = any>(endpoint: string) => api.request<T>('GET', endpoint),
+    get: <T = any>(endpoint: string, params?: Record<string, any>) => {
+        let queryString = '';
+        if (params) {
+            const searchParams = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    searchParams.append(key, value.toString());
+                }
+            });
+            queryString = searchParams.toString();
+        }
+        const fullEndpoint = queryString ? `${endpoint}?${queryString}` : endpoint;
+        return api.request<T>('GET', fullEndpoint);
+    },
     post: <T = any>(endpoint: string, body: any) => api.request<T>('POST', endpoint, body),
     put: <T = any>(endpoint: string, body: any) => api.request<T>('PUT', endpoint, body),
     delete: <T = any>(endpoint: string) => api.request<T>('DELETE', endpoint),

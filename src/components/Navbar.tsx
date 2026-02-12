@@ -85,6 +85,11 @@ export default function Navbar() {
                                     className="pl-10 h-10 w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 focus-visible:ring-offset-0 focus-visible:ring-1 focus-visible:ring-indigo-500"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+                                        }
+                                    }}
                                 />
                             </div>
                         </div>
@@ -189,6 +194,12 @@ export default function Navbar() {
                                         className="h-10 w-full"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+                                                setMobileMenuOpen(false);
+                                            }
+                                        }}
                                     />
                                 </div>
 

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -109,12 +110,14 @@ function MovieCard({ movie }: { movie: Movie }) {
 function MoviesPageContent() {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [loading, setLoading] = useState(true);
+    const searchParams = useSearchParams();
+    const query = searchParams.get('q');
 
     useEffect(() => {
         const fetchMovies = async () => {
             setLoading(true);
             try {
-                const res = await api.get('/movies');
+                const res = await api.get('/movies', { q: query || undefined });
                 setMovies(res.data || []);
             } catch (error) {
                 console.error('Failed to fetch movies', error);
@@ -123,7 +126,7 @@ function MoviesPageContent() {
             }
         };
         fetchMovies();
-    }, []);
+    }, [query]);
 
     return (
         <div className="flex flex-col lg:flex-row gap-8 items-start">
@@ -180,7 +183,9 @@ function MoviesPageContent() {
             {/* Main Content */}
             <div className="flex-1 w-full">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Movies In Mumbai</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                        {query ? `Search results for "${query}"` : 'Movies In Mumbai'}
+                    </h1>
 
                     {/* Category Chips */}
                     <div className="flex flex-wrap gap-3 mb-6">

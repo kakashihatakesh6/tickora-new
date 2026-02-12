@@ -184,11 +184,41 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
         return () => clearInterval(timer);
     }, []);
 
-    const handleSeatClick = (seatId: string) => {
-        if (selectedSeats.includes(seatId)) {
-            setSelectedSeats(selectedSeats.filter(s => s !== seatId));
-        } else if (selectedSeats.length < ticketCount) {
-            setSelectedSeats([...selectedSeats, seatId]);
+    const handleSeatClick = async (seatId: string) => {
+        const isSelected = selectedSeats.includes(seatId);
+
+        if (isSelected) {
+            // Deselect: Unlock seat
+            try {
+                await api.post('/bookings/unlock', {
+                    eventId: id,
+                    seatId: seatId
+                });
+                setSelectedSeats(selectedSeats.filter(s => s !== seatId));
+            } catch (error) {
+                console.error("Failed to unlock seat", error);
+                // Even if unlock fails, deselect locally to allow user to proceed/cancel
+                setSelectedSeats(selectedSeats.filter(s => s !== seatId));
+            }
+        } else {
+            // Select: Lock seat
+            if (selectedSeats.length >= ticketCount) {
+                alert(`You can only select up to ${ticketCount} seats.`);
+                return;
+            }
+
+            try {
+                const res = await api.post('/bookings/lock', {
+                    eventId: id,
+                    seatId: seatId
+                });
+                if (res.status === 200) {
+                    setSelectedSeats([...selectedSeats, seatId]);
+                }
+            } catch (error: any) {
+                console.error("Failed to lock seat", error);
+                alert(error.response?.data?.error || "Failed to lock seat. It might be already taken.");
+            }
         }
     };
 

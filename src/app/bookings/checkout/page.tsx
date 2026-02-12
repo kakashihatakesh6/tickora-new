@@ -67,6 +67,7 @@ function CheckoutContent() {
     const [event, setEvent] = useState<BookingEvent | null>(null);
     const [loading, setLoading] = useState(true);
     const [bookingLoading, setBookingLoading] = useState(false);
+    const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -77,6 +78,60 @@ function CheckoutContent() {
     });
 
     const selectedSeats = seatsParam ? seatsParam.split(',') : [];
+
+    // Check if Razorpay SDK is loaded
+    useEffect(() => {
+        const checkRazorpay = () => {
+            if (typeof window !== 'undefined' && window.Razorpay) {
+                setRazorpayLoaded(true);
+                return true;
+            }
+            return false;
+        };
+
+        // Check immediately
+        if (checkRazorpay()) return;
+
+        // If not loaded, check periodically
+        const interval = setInterval(() => {
+            if (checkRazorpay()) {
+                clearInterval(interval);
+            }
+        }, 100);
+
+        // Cleanup after 10 seconds
+        const timeout = setTimeout(() => {
+            clearInterval(interval);
+        }, 10000);
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeout);
+        };
+    }, []);
+
+    // Helper function to wait for Razorpay to load
+    const waitForRazorpay = (): Promise<boolean> => {
+        return new Promise((resolve) => {
+            if (typeof window !== 'undefined' && window.Razorpay) {
+                resolve(true);
+                return;
+            }
+
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max wait
+            const interval = setInterval(() => {
+                attempts++;
+                if (typeof window !== 'undefined' && window.Razorpay) {
+                    clearInterval(interval);
+                    resolve(true);
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(interval);
+                    resolve(false);
+                }
+            }, 100);
+        });
+    };
 
     useEffect(() => {
         if (!eventId) return;
@@ -131,11 +186,20 @@ function CheckoutContent() {
         setBookingLoading(true);
 
         try {
+            // Wait for Razorpay SDK to load
+            const isRazorpayLoaded = await waitForRazorpay();
+            if (!isRazorpayLoaded) {
+                alert("Payment gateway is loading. Please wait a moment and try again.");
+                setBookingLoading(false);
+                return;
+            }
+
             // 1. Create Booking with appropriate booking type
             const res = await api.post('/bookings', {
                 event_id: Number(eventId),
                 seat_numbers: selectedSeats,
-                bookingType: bookingType // Include the booking type (MOVIE, SPORT, or EVENT)
+                bookingType: bookingType, // Include the booking type (MOVIE, SPORT, or EVENT)
+                price: pricePerSeat // Send the price per seat to handle variable pricing for sports
             });
 
             const { booking, order_id } = res.data;
@@ -171,11 +235,6 @@ function CheckoutContent() {
                     color: "#4f46e5"
                 }
             };
-
-            if (!window.Razorpay) {
-                alert("Razorpay SDK failed to load. Please check your internet connection.");
-                return;
-            }
 
             const rzp1 = new window.Razorpay(options);
             rzp1.open();
