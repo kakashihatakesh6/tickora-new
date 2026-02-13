@@ -4,7 +4,8 @@ import HeroCarousel from '@/components/HeroCarousel';
 import RecommendedMovies from '@/components/RecommendedMovies';
 import RecommendedSports from '@/components/RecommendedSports';
 import RecommendedEvents from '@/components/RecommendedEvents';
-import SubNavbar from '@/components/SubNavbar';
+import Image from 'next/image';
+
 
 export default function Home() {
   return (
@@ -25,11 +26,16 @@ export default function Home() {
         {/* Add more sections here as needed, like "The Best of Live Events", etc. */}
 
         <div className="mt-12 mb-8">
-          <img
-            src="https://assets-in.bmscdn.com/discovery-catalog/collections/tr:w-1440,h-120/lead-in-v3-collection-202102040828.png"
-            alt="Ad banner"
-            className="w-full rounded-lg"
-          />
+          <div className="relative w-full h-32 rounded-lg overflow-hidden">
+            <Image
+              src="https://assets-in.bmscdn.com/discovery-catalog/collections/tr:w-1440,h-120/lead-in-v3-collection-202102040828.png"
+              alt="Ad banner"
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+
         </div>
       </div>
     </main>

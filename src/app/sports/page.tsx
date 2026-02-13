@@ -4,13 +4,11 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import api from '@/lib/api';
-import { Card, CardContent } from '@/components/ui/card';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import { ChevronDown, ChevronUp, Search, SlidersHorizontal } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface Sport {
@@ -133,8 +131,9 @@ function SportsPageContent() {
                 const res = await api.get('/sports', {
                     q: query || undefined,
                     city: cityFromStorage || 'Mumbai' // Use city from storage or default
-                });
+                }) as ApiResponse<Sport[]>;
                 setSports(res.data || []);
+
             } catch (error) {
                 console.error('Failed to fetch sports', error);
             } finally {

@@ -3,7 +3,8 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, MapPin, ChevronLeft, Share2, ThumbsUp, AlertCircle, Lightbulb, Ticket, ChevronRight, Clock, MapPinned } from 'lucide-react';
@@ -45,8 +46,9 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
     useEffect(() => {
         const fetchSport = async () => {
             try {
-                const res = await api.get(`/sports/${id}`);
+                const res = await api.get(`/sports/${id}`) as ApiResponse<Sport>;
                 setSport(res.data);
+
             } catch (error) {
                 console.error('Failed to fetch sport', error);
             } finally {
@@ -56,9 +58,10 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
         fetchSport();
     }, [id]);
 
-    const handleBook = () => {
-        router.push(`/sports/${id}/shows`);
-    };
+    // const handleBook = () => {
+    //     router.push(`/sports/${id}/shows`);
+    // };
+
 
     const handleInterested = () => {
         setIsInterested(!isInterested);
@@ -169,7 +172,8 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
                                                     const d = new Date(sport.date_time);
                                                     if (isNaN(d.getTime())) return 'Date TBA';
                                                     return `${d.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })} | ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
-                                                } catch (e) {
+                                                } catch {
+
                                                     return 'Date TBA';
                                                 }
                                             })()}

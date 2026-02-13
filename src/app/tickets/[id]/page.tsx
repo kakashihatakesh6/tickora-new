@@ -2,18 +2,22 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
 import { Download, ChevronDown, XCircle, Phone } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Share2 } from 'lucide-react';
+import Image from 'next/image';
+import { Booking } from '@/types';
+
 
 export default function TicketPage() {
     const params = useParams();
     const router = useRouter();
-    const [booking, setBooking] = useState<any>(null);
+    const [booking, setBooking] = useState<Booking | null>(null);
+
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
     const ticketRef = useRef<HTMLDivElement>(null);
@@ -22,8 +26,9 @@ export default function TicketPage() {
         const fetchBooking = async () => {
             if (!params.id) return;
             try {
-                const res = await api.get(`/bookings/${params.id}`);
+                const res = await api.get(`/bookings/${params.id}`) as ApiResponse<Booking>;
                 setBooking(res.data);
+
             } catch (error) {
                 console.error('Failed to fetch booking', error);
             } finally {
@@ -99,14 +104,16 @@ export default function TicketPage() {
                     {/* Top Section: Movie Details */}
                     <div style={{ padding: '16px', display: 'flex', gap: '16px', position: 'relative' }}>
                         {/* Poster */}
-                        <div style={{ width: '80px', height: '120px', flexShrink: 0 }}>
-                            <img
+                        <div className="relative w-20 h-32 flex-shrink-0">
+                            <Image
                                 src={`/api/image-proxy?url=${encodeURIComponent(booking.event.image_url)}`}
                                 alt={booking.event.title}
-                                crossOrigin="anonymous"
-                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                fill
+                                className="object-cover rounded-lg"
+                                unoptimized
                             />
                         </div>
+
 
                         {/* Info */}
                         <div style={{ flex: 1, fontFamily: 'sans-serif' }}>

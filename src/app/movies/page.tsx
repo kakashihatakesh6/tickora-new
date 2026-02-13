@@ -4,13 +4,11 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import api from '@/lib/api';
-import { Card, CardContent } from '@/components/ui/card';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import { ChevronDown, ChevronUp, Search, SlidersHorizontal } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface Movie {
@@ -53,7 +51,7 @@ function FilterSection({ title, children, defaultOpen = false }: { title: string
 
 function MovieCard({ movie }: { movie: Movie }) {
     // Format date if available, otherwise use a placeholder
-    const dateFormatted = "Coming Soon";
+    // const dateFormatted = "Coming Soon";
 
     return (
         <Link href={`/movies/${movie.id}`} className="group block h-full">
@@ -124,8 +122,9 @@ function MoviesPageContent() {
                 const res = await api.get('/movies', {
                     q: query || undefined,
                     city: city
-                });
+                }) as ApiResponse<Movie[]>;
                 setMovies(res.data || []);
+
             } catch (error) {
                 console.error('Failed to fetch movies', error);
             } finally {

@@ -1,14 +1,15 @@
 const BASE_URL = '/api/v1'; // Use Next.js rewrites to avoid CORS
 
-interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     data: T;
     status: number;
     statusText: string;
     headers: Headers;
 }
 
-const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<T>> => {
-    let data: any;
+
+const handleResponse = async <T = unknown>(response: Response): Promise<ApiResponse<T>> => {
+    let data: unknown;
     const contentType = response.headers.get('content-type');
 
     if (contentType && contentType.includes('application/json')) {
@@ -18,7 +19,7 @@ const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<
     }
 
     const result: ApiResponse<T> = {
-        data,
+        data: data as T,
         status: response.status,
         statusText: response.statusText,
         headers: response.headers,
@@ -33,7 +34,8 @@ const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<
             }
         }
 
-        const error = new Error(data?.error || data?.message || 'API Error') as any;
+        const errorData = data as { error?: string, message?: string } | null;
+        const error = new Error(errorData?.error || errorData?.message || 'API Error') as Error & { response?: ApiResponse<T> };
         error.response = result;
 
         console.error('API Error:', {
@@ -50,7 +52,7 @@ const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<
 };
 
 const api = {
-    request: async <T = any>(method: string, endpoint: string, body?: any): Promise<ApiResponse<T>> => {
+    request: async <T = unknown>(method: string, endpoint: string, body?: unknown): Promise<ApiResponse<T>> => {
         const url = `${BASE_URL}${endpoint}`;
 
         // Get token
@@ -73,16 +75,17 @@ const api = {
         try {
             const response = await fetch(url, config);
             return await handleResponse<T>(response);
-        } catch (error: any) {
+        } catch (error: unknown) {
             // Handle network errors or other fetch failures
-            if (!error.response) {
-                console.error('API Network Error:', error);
+            const err = error as Error & { response?: ApiResponse<T> };
+            if (!err.response) {
+                console.error('API Network Error:', err);
             }
-            throw error;
+            throw err;
         }
     },
 
-    get: <T = any>(endpoint: string, params?: Record<string, any>) => {
+    get: <T = unknown>(endpoint: string, params?: Record<string, string | number | boolean | undefined | null>) => {
         let queryString = '';
         if (params) {
             const searchParams = new URLSearchParams();
@@ -96,10 +99,11 @@ const api = {
         const fullEndpoint = queryString ? `${endpoint}?${queryString}` : endpoint;
         return api.request<T>('GET', fullEndpoint);
     },
-    post: <T = any>(endpoint: string, body: any) => api.request<T>('POST', endpoint, body),
-    put: <T = any>(endpoint: string, body: any) => api.request<T>('PUT', endpoint, body),
-    delete: <T = any>(endpoint: string) => api.request<T>('DELETE', endpoint),
-    patch: <T = any>(endpoint: string, body: any) => api.request<T>('PATCH', endpoint, body),
+    post: <T = unknown>(endpoint: string, body: unknown) => api.request<T>('POST', endpoint, body),
+    put: <T = unknown>(endpoint: string, body: unknown) => api.request<T>('PUT', endpoint, body),
+    delete: <T = unknown>(endpoint: string) => api.request<T>('DELETE', endpoint),
+    patch: <T = unknown>(endpoint: string, body: unknown) => api.request<T>('PATCH', endpoint, body),
 };
+
 
 export default api;

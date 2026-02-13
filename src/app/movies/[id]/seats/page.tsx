@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Info } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import SeatMap from '@/components/SeatMap';
-import { cn } from '@/lib/utils';
 
 interface MovieShow {
     id: number;
@@ -29,7 +29,7 @@ interface Movie {
     image_url: string;
 }
 
-export default function MovieSeatSelectionPage({ params }: { params: Promise<{ id: string }> }) {
+function MovieSeatSelectionContent({ params }: { params: Promise<{ id: string }> }) {
     const { id: movieId } = use(params);
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -53,14 +53,15 @@ export default function MovieSeatSelectionPage({ params }: { params: Promise<{ i
         const fetchData = async () => {
             try {
                 // Fetch movie details
-                const movieRes = await api.get(`/movies/${movieId}`);
+                const movieRes = await api.get(`/movies/${movieId}`) as ApiResponse<Movie>;
                 setMovie(movieRes.data);
 
                 // Fetch show details with occupied seats
                 if (showId) {
-                    const showRes = await api.get(`/movie-shows/${showId}`);
+                    const showRes = await api.get(`/movie-shows/${showId}`) as ApiResponse<MovieShow>;
                     setShow(showRes.data);
                 }
+
             } catch (error) {
                 console.error('Failed to fetch data', error);
             } finally {
@@ -101,10 +102,12 @@ export default function MovieSeatSelectionPage({ params }: { params: Promise<{ i
                 if (res.status === 200) {
                     setSelectedSeats(prev => [...prev, { id: seatId, price, tier }]);
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error("Failed to lock seat", error);
-                alert(error.response?.data?.error || "Failed to lock seat. It might be already taken.");
+                const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Failed to lock seat. It might be already taken.";
+                alert(errorMessage);
             }
+
         }
     };
 
@@ -158,14 +161,14 @@ export default function MovieSeatSelectionPage({ params }: { params: Promise<{ i
                 <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center">
                     <div className="w-full max-w-4xl pb-32 pt-8">
                         <SeatMap
-                            totalSeats={show.totalSeats}
                             occupiedSeats={show.occupied_seats || []}
                             selectedSeats={selectedSeats.map(s => s.id)}
                             maxSelectable={10}
                             onSeatSelect={handleSeatSelect}
                             basePrice={show.price}
-                            eventType="MOVIE"
+                            category="Movie"
                         />
+
                     </div>
                 </div>
 
@@ -210,5 +213,13 @@ export default function MovieSeatSelectionPage({ params }: { params: Promise<{ i
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function MovieSeatSelectionPage({ params }: { params: Promise<{ id: string }> }) {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+            <MovieSeatSelectionContent params={params} />
+        </Suspense>
     );
 }

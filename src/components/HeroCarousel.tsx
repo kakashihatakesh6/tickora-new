@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/carousel';
 import Image from 'next/image';
 import Link from 'next/link';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from './ui/button';
 
 interface HeroItem {
@@ -33,9 +34,10 @@ export default function HeroCarousel() {
         const fetchHeroItems = async () => {
             try {
                 // Fetch movies for hero carousel
-                const res = await api.get('/movies');
+                const res = await api.get('/movies') as ApiResponse<HeroItem[]>;
                 // Take top 5
                 setHeroItems(res.data.slice(0, 5));
+
             } catch (error) {
                 console.error('Failed to fetch hero items', error);
             } finally {

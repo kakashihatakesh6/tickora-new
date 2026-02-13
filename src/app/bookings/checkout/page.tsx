@@ -9,6 +9,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calendar, MapPin, Ticket as TicketIcon, User, Mail, Phone, Receipt } from 'lucide-react';
+import { ApiResponse } from '@/lib/api';
+import { Booking } from '@/types';
+
 
 // Razorpay Types
 interface RazorpayResponse {
@@ -67,7 +70,6 @@ function CheckoutContent() {
     const [event, setEvent] = useState<BookingEvent | null>(null);
     const [loading, setLoading] = useState(true);
     const [bookingLoading, setBookingLoading] = useState(false);
-    const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -83,7 +85,7 @@ function CheckoutContent() {
     useEffect(() => {
         const checkRazorpay = () => {
             if (typeof window !== 'undefined' && window.Razorpay) {
-                setRazorpayLoaded(true);
+                // setRazorpayLoaded(true);
                 return true;
             }
             return false;
@@ -146,7 +148,7 @@ function CheckoutContent() {
                     endpoint = '/sports';
                 }
 
-                const res = await api.get(`${endpoint}/${eventId}`);
+                const res = await api.get(`${endpoint}/${eventId}`) as ApiResponse<BookingEvent>;
                 setEvent(res.data);
 
                 // Try to prefill user details if available in local storage
@@ -200,9 +202,10 @@ function CheckoutContent() {
                 seat_numbers: selectedSeats,
                 bookingType: bookingType, // Include the booking type (MOVIE, SPORT, or EVENT)
                 price: pricePerSeat // Send the price per seat to handle variable pricing for sports
-            });
+            }) as ApiResponse<{ booking: Booking, order_id: string }>;
 
             const { booking, order_id } = res.data;
+
 
             // 2. Open Razorpay
             const options: RazorpayOptions = {
@@ -220,8 +223,9 @@ function CheckoutContent() {
                             razorpay_signature: response.razorpay_signature
                         });
                         router.push('/bookings');
-                    } catch (verifyError: any) {
-                        const message = verifyError.message || 'Payment verification failed!';
+                    } catch (verifyError: unknown) {
+                        const error = verifyError as { message?: string };
+                        const message = error.message || 'Payment verification failed!';
                         alert(message);
                         console.error(verifyError);
                     }
@@ -392,7 +396,7 @@ function CheckoutContent() {
                                     </div>
                                     <div>
                                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">Contact Information</h3>
-                                        <p className="text-sm text-gray-500">We'll send your tickets here.</p>
+                                        <p className="text-sm text-gray-500">We&apos;ll send your tickets here.</p>
                                     </div>
                                 </div>
 

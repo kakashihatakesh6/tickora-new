@@ -4,7 +4,8 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Loader2 } from 'lucide-react';
 
 interface SearchResult {
@@ -21,13 +22,16 @@ interface SearchResult {
 }
 
 function ResultCard({ item }: { item: SearchResult }) {
-    const dateStr = item.dateTime || item.date_time || new Date().toISOString();
-    const date = new Date(dateStr);
-    const dateFormatted = date.toLocaleDateString('en-GB', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short'
-    });
+    // const dateStr = item.dateTime || item.date_time || new Date().toISOString();
+    // const date = new Date(dateStr);
+
+
+    // const dateFormatted = date.toLocaleDateString('en-GB', {
+    //     weekday: 'short',
+    //     day: 'numeric',
+    //     month: 'short'
+    // });
+
 
     // Map event types to their respective routes
     const routeMap: Record<string, string> = {
@@ -71,13 +75,15 @@ function ResultCard({ item }: { item: SearchResult }) {
 function SearchResults() {
     const searchParams = useSearchParams();
     const query = searchParams.get('q');
-    const [results, setResults] = useState<any[]>([]);
+    const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCity, setSelectedCity] = useState('Mumbai');
+    // const [selectedCity, setSelectedCity] = useState('Mumbai');
+
 
     useEffect(() => {
         const city = localStorage.getItem('selectedLocation') || 'Mumbai';
-        setSelectedCity(city);
+        // setSelectedCity(city);
+
 
         const fetchResults = async () => {
             if (!query) {
@@ -90,8 +96,9 @@ function SearchResults() {
                 const res = await api.get('/search', {
                     q: query,
                     city: city
-                });
+                }) as ApiResponse<SearchResult[]>;
                 setResults(res.data || []);
+
             } catch (error) {
                 console.error('Failed to fetch search results', error);
             } finally {
@@ -124,9 +131,10 @@ function SearchResults() {
                 </div>
             ) : (
                 <div className="text-center py-20 bg-white dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
-                    <p className="text-slate-900 dark:text-slate-100 font-medium mb-2">No results found for "{query}"</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">Try searching for something else like "Inception", "Coldplay", or "Cricket"</p>
+                    <p className="text-slate-900 dark:text-slate-100 font-medium mb-2">No results found for &quot;{query}&quot;</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">Try searching for something else like &quot;Inception&quot;, &quot;Coldplay&quot;, or &quot;Cricket&quot;</p>
                 </div>
+
             )}
         </div>
     );

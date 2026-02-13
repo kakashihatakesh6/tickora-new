@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
+
 import Link from 'next/link';
 import MovieCard from './MovieCard'; // Reusing MovieCard for consistent look
 import {
@@ -12,24 +12,24 @@ import {
     CarouselPrevious,
 } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+import { Event as Sport } from '@/types';
 
-interface Sport {
-    id: number;
-    title: string;
-    image_url: string;
-    description: string;
-    category: string;
-}
+
+
 
 export default function RecommendedSports() {
     const [sports, setSports] = useState<Sport[]>([]);
+
+
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchSports = async () => {
             try {
-                const res = await api.get('/sports');
+                const res = await api.get('/sports') as ApiResponse<Sport[]>;
+
                 setSports(res.data);
             } catch (error) {
                 console.error('Failed to fetch sports', error);
@@ -70,7 +70,8 @@ export default function RecommendedSports() {
                                     id={sport.id}
                                     title={sport.title}
                                     image={sport.image_url}
-                                    genre={sport.category}
+                                    genre={sport.description}
+
                                     basePath="/sports"
                                 />
                             </CarouselItem>

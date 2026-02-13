@@ -2,32 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, MapPin, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TicketModal } from '@/components/ui/ticket-modal';
 
-interface Ticket {
-    id: number;
-    unique_code: string;
-    details: string; // JSON string
-}
+import { Booking } from '@/types';
 
-interface Booking {
-    id: number;
-    event: {
-        title: string;
-        venue: string;
-        city: string;
-        date_time: string;
-    };
-    seat_count: number;
-    seat_numbers?: string[];
-    total_amount: number;
-    status: string;
-    ticket?: Ticket;
-}
 
 export default function BookingsPage() {
     const router = useRouter();
@@ -44,8 +27,9 @@ export default function BookingsPage() {
             }
 
             try {
-                const res = await api.get('/bookings/my');
+                const res = await api.get('/bookings/my') as ApiResponse<Booking[]>;
                 setBookings(res.data || []);
+
             } catch (error) {
                 console.error('Failed to fetch bookings', error);
             } finally {
@@ -117,6 +101,8 @@ export default function BookingsPage() {
                 isOpen={!!selectedBooking}
                 onClose={() => setSelectedBooking(null)}
                 booking={selectedBooking}
+
+
             />
         </main>
     );

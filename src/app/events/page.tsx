@@ -4,14 +4,11 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import api from '@/lib/api';
-import { Card, CardContent } from '@/components/ui/card';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import { ChevronDown, ChevronUp, Search, SlidersHorizontal } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 
 interface Event {
     id: number;
@@ -130,8 +127,9 @@ function EventsPageContent() {
                 const res = await api.get('/events', {
                     q: query || undefined,
                     city: city
-                });
+                }) as ApiResponse<Event[]>;
                 setEvents(res.data || []);
+
             } catch (error) {
                 console.error('Failed to fetch events', error);
             } finally {

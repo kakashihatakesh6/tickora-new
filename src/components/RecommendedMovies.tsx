@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
+
 import Link from 'next/link';
 import MovieCard from './MovieCard';
 import {
@@ -12,7 +12,8 @@ import {
     CarouselPrevious,
 } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 
 interface Movie {
     id: number;
@@ -29,7 +30,8 @@ export default function RecommendedMovies() {
     useEffect(() => {
         const fetchMovies = async () => {
             try {
-                const res = await api.get('/movies');
+                const res = await api.get('/movies') as ApiResponse<Movie[]>;
+
                 setMovies(res.data);
             } catch (error) {
                 console.error('Failed to fetch movies', error);

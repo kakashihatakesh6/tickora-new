@@ -2,9 +2,11 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Calendar, Search, Filter, Info, Heart, MapPin } from 'lucide-react';
+import { ChevronLeft, Search, Filter, Info, Heart } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 interface Movie {
@@ -42,12 +44,13 @@ export default function MovieShowsPage({ params }: { params: Promise<{ id: strin
         const fetchData = async () => {
             try {
                 // Fetch movie details
-                const movieRes = await api.get(`/movies/${id}`);
+                const movieRes = await api.get(`/movies/${id}`) as ApiResponse<Movie>;
                 setMovie(movieRes.data);
 
                 // Fetch all shows for this movie
-                const showsRes = await api.get(`/movies/${id}/shows`);
+                const showsRes = await api.get(`/movies/${id}/shows`) as ApiResponse<MovieShow[]>;
                 setShows(showsRes.data);
+
             } catch (error) {
                 console.error('Failed to fetch movie data', error);
             } finally {

@@ -3,7 +3,8 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, MapPin, ChevronLeft, Star, Clock, Languages, ThumbsUp } from 'lucide-react';
@@ -51,8 +52,9 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                const res = await api.get(`/events/${id}`);
+                const res = await api.get(`/events/${id}`) as ApiResponse<Event>;
                 setEvent(res.data);
+
             } catch (error) {
                 console.error('Failed to fetch event', error);
             } finally {

@@ -28,8 +28,9 @@ export default function SignupPage() {
             await api.post('/auth/register', formData);
             // After signup, redirect to login
             router.push('/login');
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Failed to create account. Please try again.');
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { error?: string } } };
+            setError(error.response?.data?.error || 'Failed to create account. Please try again.');
         } finally {
             setIsLoading(false);
         }

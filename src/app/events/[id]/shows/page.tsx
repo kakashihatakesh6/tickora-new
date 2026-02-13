@@ -2,9 +2,10 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Calendar, Search, Filter, Info, Heart } from 'lucide-react';
+import { ChevronLeft, Search, Filter, Info, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Event {
@@ -30,8 +31,9 @@ export default function ShowsPage({ params }: { params: Promise<{ id: string }> 
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                const res = await api.get(`/events/${id}`);
+                const res = await api.get(`/events/${id}`) as ApiResponse<Event>;
                 setEvent(res.data);
+
             } catch (error) {
                 console.error('Failed to fetch event', error);
             } finally {

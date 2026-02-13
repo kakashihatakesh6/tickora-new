@@ -5,22 +5,21 @@ import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 
 interface StadiumSeatMapProps {
-    totalSeats: number;
     occupiedSeats: string[];
     selectedSeats: string[];
-    maxSelectable: number;
     onSeatSelect: (seatId: string, price: number, tier: string) => void;
     basePrice: number;
 }
 
+
+
 export default function StadiumSeatMap({
-    totalSeats,
     occupiedSeats,
     selectedSeats,
-    maxSelectable,
     onSeatSelect,
     basePrice
 }: StadiumSeatMapProps) {
+
 
     // Define blocks for the circular stadium
     // We'll use SVG to draw arc segments.

@@ -3,11 +3,13 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Search, ZoomIn, ZoomOut, Users } from 'lucide-react';
+import { ChevronLeft, ZoomIn, ZoomOut, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
+
 
 // Define seat categories and prices
 const SEAT_CATEGORIES = [
@@ -150,6 +152,7 @@ interface Sport {
     team1_flag?: string;
     team2_flag?: string;
     date_time: string;
+    occupied_seats: string[];
 }
 
 export default function SportsSeatsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -159,15 +162,16 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
     const [loading, setLoading] = useState(true);
     const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
     const [ticketCount, setTicketCount] = useState(10);
-    const [timeLeft, setTimeLeft] = useState(240); // 4 minutes
+    const [timeLeft, setTimeLeft] = useState(480); // 8 minutes
     const [isBooking, setIsBooking] = useState(false);
     const [zoom, setZoom] = useState(1);
 
     useEffect(() => {
         const fetchSport = async () => {
             try {
-                const res = await api.get(`/sports/${id}`);
+                const res = await api.get(`/sports/${id}`) as ApiResponse<Sport>;
                 setSport(res.data);
+
             } catch (error) {
                 console.error('Failed to fetch sport', error);
             } finally {
@@ -185,6 +189,11 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
     }, []);
 
     const handleSeatClick = async (seatId: string) => {
+        // Check if seat is occupied
+        if (sport?.occupied_seats?.includes(seatId)) {
+            return;
+        }
+
         const isSelected = selectedSeats.includes(seatId);
 
         if (isSelected) {
@@ -215,10 +224,12 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                 if (res.status === 200) {
                     setSelectedSeats([...selectedSeats, seatId]);
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error("Failed to lock seat", error);
-                alert(error.response?.data?.error || "Failed to lock seat. It might be already taken.");
+                const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Failed to lock seat. It might be already taken.";
+                alert(errorMessage);
             }
+
         }
     };
 
@@ -272,6 +283,7 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
         for (let row = 1; row <= rowCount; row++) {
             const seatId = `${blockLetter}${row}`;
             const isSelected = selectedSeats.includes(seatId);
+            const isOccupied = sport?.occupied_seats?.includes(seatId);
 
             // Distribute seats in a grid pattern within the sector
             const radialIndex = Math.floor((row - 1) / seatsPerRow);
@@ -291,14 +303,17 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
                     key={seatId}
                     cx={pos.x}
                     cy={pos.y}
-                    r={isSelected ? 3 : 2}
-                    fill={isSelected ? '#9333ea' : '#ffffff'}
-                    stroke={isSelected ? '#9333ea' : '#9ca3af'}
-                    strokeWidth={isSelected ? 1.5 : 0.8}
-                    className="cursor-pointer hover:fill-purple-400 transition-all"
+                    r={isSelected || isOccupied ? 3 : 2}
+                    fill={isOccupied ? '#64748b' : isSelected ? '#9333ea' : '#ffffff'}
+                    stroke={isOccupied ? '#475569' : isSelected ? '#9333ea' : '#9ca3af'}
+                    strokeWidth={isSelected || isOccupied ? 1.5 : 0.8}
+                    className={cn(
+                        "transition-all",
+                        isOccupied ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:fill-purple-400"
+                    )}
                     onClick={(e) => {
                         e.stopPropagation();
-                        handleSeatClick(seatId);
+                        if (!isOccupied) handleSeatClick(seatId);
                     }}
                 />
             );

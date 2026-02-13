@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Ticket, Menu, X, ChevronDown, Search } from 'lucide-react';
+import { LogOut, Ticket, Menu, X, ChevronDown, Search } from 'lucide-react';
+import { User } from '@/types';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './ThemeToggle';
@@ -13,8 +15,8 @@ import { Input } from './ui/input';
 
 export default function Navbar() {
     const router = useRouter();
-    const pathname = usePathname();
-    const [user, setUser] = useState<any>(null);
+
+    const [user, setUser] = useState<User | null>(null);
     const [mounted, setMounted] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -22,6 +24,7 @@ export default function Navbar() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('Mumbai');
     const [locationMenuOpen, setLocationMenuOpen] = useState(false);
+
 
     const cities = [
         'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Ahmedabad',

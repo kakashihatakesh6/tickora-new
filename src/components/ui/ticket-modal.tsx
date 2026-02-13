@@ -7,11 +7,14 @@ import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import Image from 'next/image';
+import { Booking } from '@/types';
 
 interface TicketModalProps {
     isOpen: boolean;
     onClose: () => void;
-    booking: any;
+    booking: Booking | null;
+
 }
 
 export function TicketModal({ isOpen, onClose, booking }: TicketModalProps) {
@@ -122,14 +125,16 @@ export function TicketModal({ isOpen, onClose, booking }: TicketModalProps) {
                                     {/* Top Section: Movie Details */}
                                     <div style={{ padding: '16px', display: 'flex', gap: '16px', position: 'relative' }}>
                                         {/* Poster */}
-                                        <div style={{ width: '80px', height: '110px', flexShrink: 0 }}>
-                                            <img
+                                        <div style={{ width: '80px', height: '110px', flexShrink: 0, position: 'relative' }}>
+                                            <Image
                                                 src={`/api/image-proxy?url=${encodeURIComponent(booking.event.image_url)}`}
                                                 alt={booking.event.title}
-                                                crossOrigin="anonymous"
-                                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                                fill
+                                                className="object-cover rounded-lg"
+                                                unoptimized
                                             />
                                         </div>
+
 
                                         {/* Info */}
                                         <div style={{ flex: 1, fontFamily: 'sans-serif' }}>

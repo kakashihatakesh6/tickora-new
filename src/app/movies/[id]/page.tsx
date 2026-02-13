@@ -3,11 +3,12 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, MapPin, ChevronLeft, Star, Clock, Languages, ThumbsUp, User, Film } from 'lucide-react';
-import { cn } from '@/lib/utils';
+
 import RecommendedMovies from '@/components/RecommendedMovies';
 
 interface CastMember {
@@ -83,8 +84,9 @@ export default function MovieDetailsPage({ params }: { params: Promise<{ id: str
     useEffect(() => {
         const fetchMovie = async () => {
             try {
-                const res = await api.get(`/movies/${id}`);
+                const res = await api.get(`/movies/${id}`) as ApiResponse<Movie>;
                 setMovie(res.data);
+
             } catch (error) {
                 console.error('Failed to fetch movie', error);
             } finally {

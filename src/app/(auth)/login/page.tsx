@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -8,8 +8,15 @@ import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { User } from '@/types';
 
-export default function LoginPage() {
+interface LoginResponse {
+    token: string;
+    user: User;
+}
+
+
+function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const returnUrl = searchParams.get('returnUrl');
@@ -27,16 +34,18 @@ export default function LoginPage() {
         setError('');
 
         try {
-            const response = await api.post('/auth/login', formData);
+            const response = await api.post<LoginResponse>('/auth/login', formData);
             const { token, user } = response.data;
+
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
 
             // Redirect to return URL if present, otherwise go to home
             router.push(returnUrl || '/');
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Invalid credentials. Please try again.');
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { error?: string } } };
+            setError(error.response?.data?.error || 'Invalid credentials. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -153,7 +162,7 @@ export default function LoginPage() {
                     </form>
 
                     <div className="mt-8 text-center text-sm text-gray-600">
-                        Don't have an account?{' '}
+                        Don&apos;t have an account?{' '}
                         <Link href="/signup" className="font-semibold text-indigo-600 hover:text-indigo-500">
                             Sign up for free
                         </Link>
@@ -161,5 +170,13 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <LoginContent />
+        </Suspense>
     );
 }

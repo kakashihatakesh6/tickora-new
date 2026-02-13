@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -32,11 +32,14 @@ export default function MovieCard({ id, title, image, genre, rating, votes, isPr
     return (
         <Link href={`${basePath}/${id}`} className="block group w-[210px] sm:w-[220px] shrink-0">
             <div className="relative rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-2xl group-hover:shadow-red-500/10 transition-all duration-300">
-                <img
+                <Image
                     src={image}
                     alt={title}
-                    className="w-full h-[320px] sm:h-[360px] object-cover transition-transform duration-500 group-hover:scale-105"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    unoptimized
                 />
+
                 {isPromoted && (
                     <div className="absolute top-3 right-0 bg-red-600 text-white text-[10px] items-center font-bold px-2 py-0.5 rounded-l-sm z-10 uppercase tracking-widest shadow-lg">
                         Promoted

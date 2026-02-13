@@ -6,26 +6,25 @@ import { Check } from 'lucide-react';
 import StadiumSeatMap from './StadiumSeatMap';
 
 interface SeatMapProps {
-    totalSeats: number;
     occupiedSeats: string[];
     selectedSeats: string[];
     maxSelectable: number;
     onSeatSelect: (seatId: string, price: number, tier: string) => void;
     basePrice: number;
-    eventType: string; // 'MOVIE', 'SPORT', 'CONCERT'
     category?: string; // 'Cricket', etc.
 }
 
+
+
 export default function SeatMap({
-    totalSeats,
     occupiedSeats,
     selectedSeats,
-    maxSelectable,
     onSeatSelect,
     basePrice,
-    eventType,
     category
 }: SeatMapProps) {
+
+
     // Generate seat layout
     const layout = useMemo(() => {
         const rows: { name: string; seats: { id: string; tier: 'PREMIUM' | 'STANDARD'; price: number }[]; gap: number | null }[] = [];
@@ -71,14 +70,13 @@ export default function SeatMap({
     if (category === 'Cricket') {
         return (
             <StadiumSeatMap
-                totalSeats={totalSeats}
                 occupiedSeats={occupiedSeats}
                 selectedSeats={selectedSeats}
-                maxSelectable={maxSelectable}
                 onSeatSelect={onSeatSelect}
                 basePrice={basePrice}
             />
         );
+
     }
 
     return (

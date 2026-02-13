@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
+
 import Link from 'next/link';
 import MovieCard from './MovieCard';
 import {
@@ -12,24 +12,24 @@ import {
     CarouselPrevious,
 } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
-import api from '@/lib/api';
+import api, { ApiResponse } from '@/lib/api';
+import { Event } from '@/types';
 
-interface Event {
-    id: number;
-    title: string;
-    image_url: string;
-    description: string;
-    event_type: string;
-}
+
+
 
 export default function RecommendedEvents() {
     const [events, setEvents] = useState<Event[]>([]);
+
+
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const res = await api.get('/events');
+                const res = await api.get('/events') as ApiResponse<Event[]>;
+
                 setEvents(res.data);
             } catch (error) {
                 console.error('Failed to fetch events', error);
