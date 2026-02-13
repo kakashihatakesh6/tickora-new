@@ -5,12 +5,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const backendUrl = `http://localhost:8080/api/v1/events/${id}`;
+  const backendUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/events/${id}`;
 
   try {
     const response = await fetch(backendUrl);
     const data = await response.json();
-    
+
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error('Proxy error:', error);

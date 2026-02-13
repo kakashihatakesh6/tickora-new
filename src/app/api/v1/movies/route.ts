@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const backendUrl = `http://localhost:8080/api/v1/movies?${searchParams.toString()}`;
+  const backendUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/movies?${searchParams.toString()}`;
 
   try {
     const response = await fetch(backendUrl);
     const data = await response.json();
-    
+
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error('Proxy error:', error);
