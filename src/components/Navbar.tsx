@@ -34,11 +34,21 @@ export default function Navbar() {
 
     useEffect(() => {
         setMounted(true);
-        const token = localStorage.getItem('token');
-        const userData = localStorage.getItem('user');
-        if (token && userData) {
-            setUser(JSON.parse(userData));
-        }
+
+        const loadUser = () => {
+            const token = localStorage.getItem('token');
+            const userData = localStorage.getItem('user');
+            if (token && userData) {
+                setUser(JSON.parse(userData));
+            } else {
+                setUser(null);
+            }
+        };
+
+        loadUser();
+
+        window.addEventListener('storage', loadUser);
+        window.addEventListener('auth-update', loadUser);
 
         const savedLocation = localStorage.getItem('selectedLocation');
         if (savedLocation) {
@@ -50,7 +60,11 @@ export default function Navbar() {
         };
 
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('storage', loadUser);
+            window.removeEventListener('auth-update', loadUser);
+        };
     }, []);
 
     const handleLocationSelect = (city: string) => {

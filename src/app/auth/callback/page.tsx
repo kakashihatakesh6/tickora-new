@@ -30,11 +30,13 @@ function AuthCallbackContent() {
                         const userData = await response.json();
                         localStorage.setItem('user', JSON.stringify(userData));
 
-                        // Dispatch storage event
+                        // Dispatch events to update UI components
                         window.dispatchEvent(new Event('storage'));
+                        window.dispatchEvent(new Event('auth-update'));
 
                         toast.success('Successfully logged in!');
-                        window.location.href = '/';
+                        router.push('/');
+                        router.refresh(); // Ensure server components revalidating if needed
                     } else {
                         throw new Error('Failed to fetch user profile');
                     }
