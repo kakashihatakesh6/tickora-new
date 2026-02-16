@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Calendar, MapPin, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TicketModal } from '@/components/ui/ticket-modal';
+import { BookingCardSkeleton } from '@/components/skeletons';
 
 import { Booking } from '@/types';
 
@@ -39,7 +40,18 @@ export default function BookingsPage() {
         fetchBookings();
     }, [router]);
 
-    if (loading) return <div className="p-12 text-center">Loading your bookings...</div>;
+    if (loading) {
+        return (
+            <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8 bg-background min-h-screen">
+                <h1 className="mb-10 text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">My Bookings</h1>
+                <div className="space-y-8">
+                    {[1, 2, 3].map((i) => (
+                        <BookingCardSkeleton key={i} />
+                    ))}
+                </div>
+            </main>
+        );
+    }
 
     return (
         <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8 bg-background min-h-screen">

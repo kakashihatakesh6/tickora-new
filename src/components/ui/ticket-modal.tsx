@@ -76,7 +76,11 @@ export function TicketModal({ isOpen, onClose, booking }: TicketModalProps) {
     // Fallbacks
     const language = booking?.event?.language || 'Hindi';
     const format = booking?.event?.format || '2D';
-    const screen = booking?.event?.screen_number || 'AUDI 2';
+
+
+    const isMovie = booking?.booking_type === 'MOVIE';
+    const screen = booking?.event?.screen_number || (isMovie ? 'AUDI 2' : undefined);
+
     const ticketLevel = booking?.event?.ticket_level || 'CLASSIC';
 
     // Generate alphanumeric Booking ID
@@ -157,7 +161,9 @@ export function TicketModal({ isOpen, onClose, booking }: TicketModalProps) {
 
                                         <div style={{ marginBottom: '16px', textAlign: 'center' }}>
                                             <p style={{ fontSize: '12px', color: '#666' }}>{booking.seat_count} Ticket(s)</p>
-                                            <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#000' }}>{screen}</p>
+                                            {screen && (
+                                                <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#000' }}>{screen}</p>
+                                            )}
                                             <p style={{ fontSize: '14px', color: '#333' }}>{ticketLevel} - <span style={{ fontWeight: 'bold' }}>{booking.seat_numbers?.join(', ')}</span></p>
                                         </div>
 

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ZoomIn, ZoomOut, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { SeatLayoutSkeleton } from '@/components/skeletons';
 
 
 // Define seat categories and prices
@@ -266,7 +267,7 @@ export default function SportsSeatsPage({ params }: { params: Promise<{ id: stri
         }
     };
 
-    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+    if (loading) return <SeatLayoutSkeleton />;
     if (!sport) return <div className="min-h-screen bg-background flex items-center justify-center">Sport not found</div>;
 
     // Generate seats within each block

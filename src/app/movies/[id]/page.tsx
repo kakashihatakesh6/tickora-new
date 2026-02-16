@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, MapPin, ChevronLeft, Star, Clock, Languages, ThumbsUp, User, Film } from 'lucide-react';
 
 import RecommendedMovies from '@/components/RecommendedMovies';
+import { EventDetailsSkeleton } from '@/components/skeletons';
 
 interface CastMember {
     name: string;
@@ -101,15 +102,7 @@ export default function MovieDetailsPage({ params }: { params: Promise<{ id: str
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-background pb-20 pt-20 flex justify-center">
-                <div className="animate-pulse flex flex-col items-center">
-                    <div className="h-96 w-64 bg-slate-200 dark:bg-slate-800 rounded-2xl mb-6 shadow-2xl"></div>
-                    <div className="h-10 w-80 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
-                    <div className="h-5 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                </div>
-            </div>
-        );
+        return <EventDetailsSkeleton />;
     }
 
     if (!movie) {

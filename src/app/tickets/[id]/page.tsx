@@ -78,7 +78,10 @@ export default function TicketPage() {
 
     const language = booking.event.language || 'Hindi';
     const format = booking.event.format || '2D';
-    const screen = booking.event.screen_number || 'AUDI 2';
+
+    const isMovie = booking.booking_type === 'MOVIE';
+    const screen = booking.event.screen_number || (isMovie ? 'AUDI 2' : undefined);
+
     const ticketLevel = booking.event.ticket_level || 'CLASSIC';
     const uniqueCode = booking.ticket?.unique_code || `BM-${booking.id}`;
 
@@ -150,7 +153,9 @@ export default function TicketPage() {
                         {/* Seat Details */}
                         <div style={{ flex: 1, paddingLeft: '20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
                             <p style={{ fontSize: '12px', color: '#666', margin: '0 0 8px 0' }}>{booking.seat_count} Ticket(s)</p>
-                            <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', color: '#000', textTransform: 'uppercase' }}>{screen}</h3>
+                            {screen && (
+                                <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', color: '#000', textTransform: 'uppercase' }}>{screen}</h3>
+                            )}
                             <p style={{ fontSize: '13px', color: '#666', margin: '0 0 12px 0' }}>{ticketLevel} - <span style={{ fontWeight: 'bold', color: '#000' }}>{booking.seat_numbers?.join(', ')}</span></p>
 
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

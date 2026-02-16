@@ -7,6 +7,7 @@ import api, { ApiResponse } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import SeatMap from '@/components/SeatMap';
+import { SeatLayoutSkeleton } from '@/components/skeletons';
 
 interface MovieShow {
     id: number;
@@ -121,7 +122,7 @@ function MovieSeatSelectionContent({ params }: { params: Promise<{ id: string }>
         router.push(`/bookings/checkout?eventId=${showId}&seats=${seatsParam}&type=MOVIE`);
     };
 
-    if (loading) return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+    if (loading) return <SeatLayoutSkeleton />;
     if (!movie || !show) return <div className="min-h-screen bg-background flex items-center justify-center">Show not found</div>;
 
     const totalPrice = selectedSeats.reduce((acc, s) => acc + s.price, 0);
@@ -218,7 +219,7 @@ function MovieSeatSelectionContent({ params }: { params: Promise<{ id: string }>
 
 export default function MovieSeatSelectionPage({ params }: { params: Promise<{ id: string }> }) {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+        <Suspense fallback={<SeatLayoutSkeleton />}>
             <MovieSeatSelectionContent params={params} />
         </Suspense>
     );

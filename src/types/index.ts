@@ -24,6 +24,7 @@ export interface Event {
 
 export interface Booking {
     id: number;
+    booking_type?: string;
     event: Event;
     seat_count: number;
     seat_numbers: string[];

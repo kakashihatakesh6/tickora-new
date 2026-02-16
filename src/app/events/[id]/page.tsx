@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, MapPin, ChevronLeft, Star, Clock, Languages, ThumbsUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EventDetailsSkeleton } from '@/components/skeletons';
 
 // Define types for Cast and Crew based on backend seed
 interface CastMember {
@@ -69,36 +70,7 @@ export default function EventDetailsPage({ params }: { params: Promise<{ id: str
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-background pb-20">
-                {/* Hero Skeleton */}
-                <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden bg-gray-200 dark:bg-gray-900 animate-pulse">
-                    <div className="h-20" /> {/* Navbar Spacer */}
-                    <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col">
-                        <div className="pt-6 pb-8">
-                            <div className="h-10 w-32 bg-gray-300 dark:bg-gray-800 rounded-full" />
-                        </div>
-                        <div className="mt-auto pb-12 md:pb-16 flex flex-col md:flex-row gap-8 items-end">
-                            {/* Poster Skeleton */}
-                            <div className="h-72 w-52 md:h-96 md:w-72 bg-gray-300 dark:bg-gray-800 rounded-2xl shrink-0" />
-
-                            {/* Details Skeleton */}
-                            <div className="flex-1 space-y-4 w-full">
-                                <div className="flex gap-3 mb-2">
-                                    <div className="h-6 w-20 bg-gray-300 dark:bg-gray-800 rounded-full" />
-                                    <div className="h-6 w-24 bg-gray-300 dark:bg-gray-800 rounded-full" />
-                                </div>
-                                <div className="h-12 md:h-16 w-3/4 bg-gray-300 dark:bg-gray-800 rounded-lg" />
-                                <div className="flex gap-8 mt-4">
-                                    <div className="h-8 w-40 bg-gray-300 dark:bg-gray-800 rounded-lg" />
-                                    <div className="h-8 w-40 bg-gray-300 dark:bg-gray-800 rounded-lg" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+        return <EventDetailsSkeleton />;
     }
 
     if (!event) {

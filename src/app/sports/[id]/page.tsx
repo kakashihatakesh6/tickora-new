@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, MapPin, ChevronLeft, Share2, ThumbsUp, AlertCircle, Lightbulb, Ticket, ChevronRight, Clock, MapPinned } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EventDetailsSkeleton } from '@/components/skeletons';
 
 interface Sport {
     id: number;
@@ -77,15 +78,7 @@ export default function SportDetailsPage({ params }: { params: Promise<{ id: str
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-background pb-20 pt-20 flex justify-center">
-                <div className="animate-pulse flex flex-col items-center">
-                    <div className="h-64 w-48 bg-slate-200 dark:bg-slate-800 rounded-2xl mb-6 shadow-2xl"></div>
-                    <div className="h-10 w-80 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
-                    <div className="h-5 w-64 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                </div>
-            </div>
-        );
+        return <EventDetailsSkeleton />;
     }
 
     if (!sport) {
