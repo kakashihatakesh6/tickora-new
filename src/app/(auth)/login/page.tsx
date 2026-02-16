@@ -9,43 +9,62 @@ import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { User } from '@/types';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { toast } from 'sonner';
 
 interface LoginResponse {
     token: string;
     user: User;
 }
 
+const loginSchema = z.object({
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const returnUrl = searchParams.get('returnUrl');
-
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginFormValues>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: '',
+            password: '',
+        },
+    });
+
+    const onSubmit = async (data: LoginFormValues) => {
         setIsLoading(true);
-        setError('');
-
         try {
-            const response = await api.post<LoginResponse>('/auth/login', formData);
+            const response = await api.post<LoginResponse>('/auth/login', data);
             const { token, user } = response.data;
-
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
+
+            toast.success("Welcome back!", {
+                description: "You have successfully signed in.",
+            });
 
             // Redirect to return URL if present, otherwise go to home
             router.push(returnUrl || '/');
         } catch (err: unknown) {
             const error = err as { response?: { data?: { error?: string } } };
-            setError(error.response?.data?.error || 'Invalid credentials. Please try again.');
+            const errorMessage = error.response?.data?.error || 'Invalid credentials. Please try again.';
+            toast.error("Login failed", {
+                description: errorMessage,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -99,17 +118,7 @@ function LoginContent() {
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="rounded-lg bg-red-50 p-4 text-sm text-red-500 border border-red-100"
-                            >
-                                {error}
-                            </motion.div>
-                        )}
-
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700" htmlFor="email">Email</label>
                             <div className="relative">
@@ -118,12 +127,13 @@ function LoginContent() {
                                     id="email"
                                     type="email"
                                     placeholder="name@example.com"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    required
-                                    className="pl-10 h-11 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
+                                    {...register("email")}
+                                    className={`pl-10 h-11 focus:ring-indigo-500 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'}`}
                                 />
                             </div>
+                            {errors.email && (
+                                <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -138,12 +148,13 @@ function LoginContent() {
                                 <Input
                                     id="password"
                                     type="password"
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    required
-                                    className="pl-10 h-11 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
+                                    {...register("password")}
+                                    className={`pl-10 h-11 focus:ring-indigo-500 ${errors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'}`}
                                 />
                             </div>
+                            {errors.password && (
+                                <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+                            )}
                         </div>
 
                         <Button

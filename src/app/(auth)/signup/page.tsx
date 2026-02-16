@@ -8,29 +8,54 @@ import { Loader2, Mail, Lock, User, ArrowRight } from 'lucide-react';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { toast } from 'sonner';
+
+const signupSchema = z.object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
     const router = useRouter();
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-    });
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setError('');
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<SignupFormValues>({
+        resolver: zodResolver(signupSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            password: '',
+        },
+    });
 
+    const onSubmit = async (data: SignupFormValues) => {
+        setIsLoading(true);
         try {
-            await api.post('/auth/register', formData);
+            await api.post('/auth/register', data);
+
+            toast.success("Account created!", {
+                description: "You can now sign in with your credentials.",
+            });
+
             // After signup, redirect to login
             router.push('/login');
         } catch (err: unknown) {
             const error = err as { response?: { data?: { error?: string } } };
-            setError(error.response?.data?.error || 'Failed to create account. Please try again.');
+            const errorMessage = error.response?.data?.error || 'Failed to create account. Please try again.';
+
+            toast.error("Signup failed", {
+                description: errorMessage,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -84,17 +109,7 @@ export default function SignupPage() {
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="rounded-lg bg-red-50 p-4 text-sm text-red-500 border border-red-100"
-                            >
-                                {error}
-                            </motion.div>
-                        )}
-
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700" htmlFor="name">Full Name</label>
                             <div className="relative">
@@ -103,12 +118,13 @@ export default function SignupPage() {
                                     id="name"
                                     type="text"
                                     placeholder="John Doe"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    required
-                                    className="pl-10 h-11 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                                    {...register("name")}
+                                    className={`pl-10 h-11 focus:ring-purple-500 ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-500'}`}
                                 />
                             </div>
+                            {errors.name && (
+                                <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -119,12 +135,13 @@ export default function SignupPage() {
                                     id="email"
                                     type="email"
                                     placeholder="name@example.com"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    required
-                                    className="pl-10 h-11 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                                    {...register("email")}
+                                    className={`pl-10 h-11 focus:ring-purple-500 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-500'}`}
                                 />
                             </div>
+                            {errors.email && (
+                                <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -134,13 +151,13 @@ export default function SignupPage() {
                                 <Input
                                     id="password"
                                     type="password"
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    required
-                                    minLength={6}
-                                    className="pl-10 h-11 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                                    {...register("password")}
+                                    className={`pl-10 h-11 focus:ring-purple-500 ${errors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-purple-500'}`}
                                 />
                             </div>
+                            {errors.password && (
+                                <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+                            )}
                             <p className="text-xs text-gray-500">Must be at least 6 characters long</p>
                         </div>
 

@@ -1,6 +1,7 @@
 import NavbarWrapper from '@/components/NavbarWrapper';
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Script from 'next/script';
+import { Toaster } from "@/components/ui/sonner";
 import './globals.css';
 
 export default function RootLayout({
@@ -19,6 +20,7 @@ export default function RootLayout({
         >
           <NavbarWrapper />
           {children}
+          <Toaster />
         </ThemeProvider>
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       </body>

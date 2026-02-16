@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { LogOut, Ticket, Menu, X, ChevronDown, Search } from 'lucide-react';
+import { toast } from 'sonner';
 import { User } from '@/types';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -64,6 +65,7 @@ export default function Navbar() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
+        toast.success("Logged out successfully");
         router.push('/login');
         router.refresh();
     };
