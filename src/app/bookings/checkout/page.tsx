@@ -11,6 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Calendar, MapPin, Ticket as TicketIcon, User, Mail, Phone, Receipt } from 'lucide-react';
 import { ApiResponse } from '@/lib/api';
 import { Booking } from '@/types';
+import PaymentProcessing from '@/components/PaymentProcessing';
+import { AnimatePresence } from 'framer-motion';
 
 
 // Razorpay Types
@@ -70,6 +72,7 @@ function CheckoutContent() {
     const [event, setEvent] = useState<BookingEvent | null>(null);
     const [loading, setLoading] = useState(true);
     const [bookingLoading, setBookingLoading] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -215,15 +218,21 @@ function CheckoutContent() {
                 name: "Ticket Master",
                 description: `Booking for ${event.title}`,
                 order_id: order_id,
+                // ... inside Razorpay handler ...
                 handler: async function (response: RazorpayResponse) {
+                    setIsVerifying(true); // Show full screen loader
                     try {
                         await api.post('/bookings/verify', {
                             booking_id: booking.id,
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_signature: response.razorpay_signature
                         });
-                        router.push('/bookings');
+                        // Allow some time for the progress bar to complete visually
+                        setTimeout(() => {
+                            router.push('/bookings');
+                        }, 2000);
                     } catch (verifyError: unknown) {
+                        setIsVerifying(false); // Hide loader on error
                         const error = verifyError as { message?: string };
                         const message = error.message || 'Payment verification failed!';
                         alert(message);
@@ -298,6 +307,10 @@ function CheckoutContent() {
 
     return (
         <main className="min-h-screen bg-background pt-10 pb-20 px-4 sm:px-6 lg:px-8">
+            <AnimatePresence>
+                {isVerifying && <PaymentProcessing />}
+            </AnimatePresence>
+
             <div className="max-w-6xl mx-auto">
                 <div className="mb-12 text-center md:text-left">
                     <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Checkout</h1>
