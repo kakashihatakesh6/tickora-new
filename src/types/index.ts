@@ -2,7 +2,8 @@ export interface User {
     id: number;
     name: string;
     email: string;
-    role?: string;
+    role: string;
+    profilePicture?: string;
 }
 
 export interface Event {

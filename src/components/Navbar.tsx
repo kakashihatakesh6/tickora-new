@@ -169,8 +169,16 @@ export default function Navbar() {
                                             className="gap-2 pl-2 pr-1 rounded-full border border-gray-200 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                                             onClick={() => setUserMenuOpen(!userMenuOpen)}
                                         >
-                                            <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center text-xs font-bold">
-                                                {user.name?.charAt(0).toUpperCase()}
+                                            <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center text-xs font-bold overflow-hidden">
+                                                {user.profilePicture ? (
+                                                    <img
+                                                        src={user.profilePicture}
+                                                        alt={user.name}
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                ) : (
+                                                    user.name?.charAt(0).toUpperCase()
+                                                )}
                                             </div>
                                             <span className="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[100px] truncate">
                                                 {user.name}
@@ -275,8 +283,16 @@ export default function Navbar() {
                                     {user ? (
                                         <>
                                             <div className="flex items-center gap-3 px-3 py-3">
-                                                <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
-                                                    {user.name?.charAt(0).toUpperCase()}
+                                                <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold overflow-hidden">
+                                                    {user.profilePicture ? (
+                                                        <img
+                                                            src={user.profilePicture}
+                                                            alt={user.name}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        user.name?.charAt(0).toUpperCase()
+                                                    )}
                                                 </div>
                                                 <div className="flex-1">
                                                     <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
