@@ -49,17 +49,17 @@ export default function HeroCarousel() {
 
     if (loading) {
         return (
-            <div className="w-full h-[300px] md:h-[400px] bg-gray-200 dark:bg-gray-800 animate-pulse" />
+            <div className="w-[80%] mx-auto h-[300px] bg-gray-200 dark:bg-gray-800 animate-pulse rounded-xl my-6" />
         );
     }
 
     if (heroItems.length === 0) return null;
 
     return (
-        <div className="w-full bg-gray-100 dark:bg-gray-900 py-2">
+        <div className="w-full bg-gray-100 dark:bg-gray-900 py-6">
             <Carousel
                 plugins={[plugin.current]}
-                className="w-full max-w-[1440px] mx-auto px-0 md:px-4"
+                className="w-[80%] mx-auto"
                 onMouseEnter={plugin.current.stop}
                 onMouseLeave={plugin.current.reset}
                 opts={{
@@ -71,8 +71,8 @@ export default function HeroCarousel() {
                     {heroItems.map((item) => (
                         <CarouselItem key={item.id} className="">
                             <div className="">
-                                <Card className="border-0 rounded-none md:rounded-lg overflow-hidden shadow-none group relative">
-                                    <CardContent className="flex aspect-[16/9] md:aspect-[21/9] items-center justify-center p-0 relative">
+                                <Card className="border-0 rounded-xl overflow-hidden shadow-lg group relative">
+                                    <CardContent className="flex h-[300px] items-center justify-center p-0 relative">
                                         <Link href={`/movies/${item.id}`} className="w-full h-full relative">
                                             <Image
                                                 src={item.image_url}

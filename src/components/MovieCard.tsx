@@ -31,7 +31,7 @@ export default function MovieCard({ id, title, image, genre, rating, votes, isPr
 
     return (
         <Link href={`${basePath}/${id}`} className="block group w-[210px] sm:w-[220px] shrink-0">
-            <div className="relative rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-2xl group-hover:shadow-red-500/10 transition-all duration-300">
+            <div className="relative aspect-[2/3] rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-2xl group-hover:shadow-red-500/10 transition-all duration-300">
                 <Image
                     src={image}
                     alt={title}
