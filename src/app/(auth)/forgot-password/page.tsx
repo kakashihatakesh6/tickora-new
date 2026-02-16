@@ -80,7 +80,7 @@ function ForgotPasswordContent() {
                         transition={{ delay: 0.2 }}
                     >
                         <h2 className="text-4xl font-bold leading-tight">
-                            Don't worry, we got you.
+                            Don&apos;t worry, we got you.
                         </h2>
                         <p className="mt-4 text-lg text-indigo-200">
                             Reset your password in a few simple steps and get back to discovering events.
@@ -107,7 +107,7 @@ function ForgotPasswordContent() {
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Forgot password?</h1>
                         <p className="mt-2 text-gray-600">
-                            No worries, we'll send you reset instructions.
+                            No worries, we&apos;ll send you reset instructions.
                         </p>
                     </div>
 

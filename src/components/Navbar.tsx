@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -185,10 +186,13 @@ export default function Navbar() {
                                         >
                                             <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center text-xs font-bold overflow-hidden">
                                                 {user.profilePicture ? (
-                                                    <img
+                                                    <Image
                                                         src={user.profilePicture}
                                                         alt={user.name}
                                                         className="h-full w-full object-cover"
+                                                        width={28}
+                                                        height={28}
+                                                        unoptimized
                                                     />
                                                 ) : (
                                                     user.name?.charAt(0).toUpperCase()
@@ -299,10 +303,13 @@ export default function Navbar() {
                                             <div className="flex items-center gap-3 px-3 py-3">
                                                 <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold overflow-hidden">
                                                     {user.profilePicture ? (
-                                                        <img
+                                                        <Image
                                                             src={user.profilePicture}
                                                             alt={user.name}
                                                             className="h-full w-full object-cover"
+                                                            width={32}
+                                                            height={32}
+                                                            unoptimized
                                                         />
                                                     ) : (
                                                         user.name?.charAt(0).toUpperCase()
