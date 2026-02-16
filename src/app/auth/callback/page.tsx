@@ -20,7 +20,7 @@ function AuthCallbackContent() {
                     localStorage.setItem('token', token);
 
                     // Fetch user details
-                    const response = await fetch('http://localhost:8080/api/v1/auth/me', {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
