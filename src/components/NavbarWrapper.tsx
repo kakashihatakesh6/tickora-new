@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 
 export default function NavbarWrapper() {
     const pathname = usePathname();
-    const isAuthPage = pathname === '/login' || pathname === '/signup';
+    const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname?.startsWith('/admin');
 
     if (isAuthPage) {
         return null;
